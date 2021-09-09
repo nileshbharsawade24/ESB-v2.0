@@ -1,6 +1,6 @@
 #include<stdio.h>
 
 int main(){
-    printf("Hello World!, Hope you are enjoying work.");
+    printf("This is a test comment.");
     return 0;
 }
