@@ -1,5 +1,5 @@
 //Author : Deepak kumar
-//Destination : Senior Member Technical
+//Designation : Senior Member Technical
 //Employer : Broadridge
 
 /*
