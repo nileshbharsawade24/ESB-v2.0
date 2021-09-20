@@ -4,8 +4,8 @@
 
 int fetch_new_request_from_db(bmd *request)
 {
-    /** 
-     * TODO: query the DB for this, and populate the 
+    /**
+     * TODO: query the DB for this, and populate the
      * request pointer with the requests.
      */
     printf("Checking for new requests in esb_requests table.\n");
