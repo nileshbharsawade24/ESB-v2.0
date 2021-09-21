@@ -1,3 +1,5 @@
+// ref : https://stackoverflow.com/questions/44068549/setting-socket-timeout-for-receive-function
+// ref : https://www.geeksforgeeks.org/tcp-server-client-implementation-in-c/
 #include <unistd.h>
 #include <stdio.h>
 #include <netdb.h>
@@ -10,21 +12,21 @@
 #define PORT 8889
 #define SA struct sockaddr
 
-// Function designed for chat between client and server.
 void func(int sockfd)
 {
+	struct timeval tv;
+	tv.tv_sec = 2;
+	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	char buff[MAX];
-	int n;
-	// infinite loop for chat
-	for (;;) {
-		bzero(buff, MAX);
-
-		// read the message from client and copy it in buffer
-		int x=read(sockfd, buff, sizeof(buff));
-		printf("=========================================\n");
-		// print buffer which contains the client contents
-		printf("%s", buff);
-	}
+	bzero(buff, MAX);
+	FILE * fp=fopen("test.txt","w");
+	fclose(fp);
+	fp=fopen("test.txt","a");
+	while (recv(sockfd, buff, MAX, 0)>=0) {
+    fprintf(fp,"%s",buff);
+  }
+	fclose(fp);
+	close(sockfd);
 }
 
 // Driver function
@@ -66,17 +68,19 @@ int main()
 		printf("Server listening..\n");
 	len = sizeof(cli);
 
-	// Accept the data packet from client and verification
-	connfd = accept(sockfd, (SA*)&cli, &len);
-	if (connfd < 0) {
-		printf("server acccept failed...\n");
-		exit(0);
-	}
-	else
-		printf("server acccept the client...\n");
+	while (1) {
+		// Accept the data packet from client and verification
+		connfd = accept(sockfd, (SA*)&cli, &len);
+		if (connfd < 0) {
+			printf("server acccept failed...\n");
+			exit(0);
+		}
+		else
+			printf("server acccept the client...\n");
 
-	// Function for chatting between client and server
-	func(connfd);
+		// Function for chatting between client and server
+		func(connfd);
+	}
 
 	// After chatting close the socket
 	close(sockfd);
