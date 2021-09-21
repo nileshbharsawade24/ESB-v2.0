@@ -42,26 +42,28 @@ int main(int argc, char **argv)
   {
         handle_error(con);
   }
-  
+
   con=mysql_init(NULL);
   if (mysql_real_connect(con, mysql_host, mysql_user_name, mysql_user_password,
           "CAMEL_DB", 0, NULL, 0) == NULL)
   {
         handle_error(con);
   }
-  
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS routes ("
-  			"route_id INT PRIMARY KEY," 
+  			"route_id INT,"
   			"sender VARCHAR(45),"
   			"destination VARCHAR(45),"
   			"message_type VARCHAR(45),"
-  			"is_active TINYINT"
+  			"is_active TINYINT,"
+        "PRIMARY KEY (route_id,sender,destination),"
+        "UNIQUE (sender,destination,message_type)"
   			 ")")){
         handle_error(con);
   }
-  
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS esb_request ("
-  			"id INT PRIMARY KEY," 
+  			"id INT PRIMARY KEY,"
   			"sender_id VARCHAR(45),"
   			"dest_id VARCHAR(45),"
   			"message_type VARCHAR(45),"
@@ -74,22 +76,34 @@ int main(int argc, char **argv)
   			 ")")){
         handle_error(con);
   }
-  
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transform_config ("
-  			"id INT PRIMARY KEY," 
+  			"id INT PRIMARY KEY,"
   			"route_id INT,"
   			"config_key VARCHAR(45),"
-  			"config_value TEXT"
+  			"config_value TEXT,"
+        "UNIQUE (route_id,config_key)"
   			 ")")){
         handle_error(con);
   }
-  
+
+  if (mysql_query(con, "CREATE INDEX route_idx"
+                       "ON transform_config (route_id)"){
+        handle_error(con);
+  }
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transport_config ("
-  			"id INT PRIMARY KEY," 
+  			"id INT PRIMARY KEY,"
   			"route_id INT,"
   			"config_key VARCHAR(45),"
-  			"config_value TEXT"
+  			"config_value TEXT,"
+        "UNIQUE (route_id,config_key)"
   			 ")")){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "CREATE INDEX route_idx"
+                       "ON transport_config (route_id)"){
         handle_error(con);
   }
 
