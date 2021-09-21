@@ -14,12 +14,12 @@ NOTE2 : change mysql_user_name and my_sql_password appropritely or just create o
 #include <string.h>
 #include <ctype.h>
 
-#include <time.h>
+#include "database_access.h"
 
-#define mysql_user_name "test_user"
-#define mysql_user_password "test_password"
-#define mysql_host "localhost"
-#define mysql_db_name "CAMEL_DB"
+// #define mysql_user_name "test_user"
+// #define mysql_user_password "test_password"
+// #define mysql_host "localhost"
+// #define mysql_db_name "CAMEL_DB"
 
 
 void handle_error(MYSQL *connection){
@@ -154,6 +154,7 @@ void insert_one_in_transform_config(MYSQL * conn,const char * f1,const char * f2
   }
 }
 
+/*
 int main(int argc, char **argv)
 {
   MYSQL *con = mysql_init(NULL);
@@ -200,3 +201,4 @@ int main(int argc, char **argv)
   mysql_close(con);
   exit(0);
 }
+*/

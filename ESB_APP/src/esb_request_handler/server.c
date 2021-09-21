@@ -9,49 +9,21 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdbool.h>
+#include <mysql.h>
+
+#include "parser/http_parser.h"
+#include "parser/xml_parser.h"
+#include "../database_handler/database_access.h"
 
 #define MAX 102400
 #define PORT 8888
 #define SA struct sockaddr
+#define mysql_user_name "test_user"
+#define mysql_user_password "test_password"
+#define mysql_host "localhost"
+#define mysql_db_name "CAMEL_DB"
 
-void parse_http_request(char const * input_fpath){
-  char * output_fpath="BMD.xml";
-  FILE * f_r=fopen(input_fpath,"r");
-  FILE * f_w=fopen(output_fpath,"w");
-
-  if (f_r == NULL)return;
-
-  int last_idx=-1;
-  int i=0;
-  char c;
-  while((c=fgetc(f_r))!=EOF){
-    if(c=='>')last_idx=i;
-    i++;
-  }
-
-  f_r=fopen(input_fpath,"r");
-  i=0;
-
-    bool start=false;
-    while((c=fgetc(f_r))!=EOF){
-      if(start){
-        fputc(c,f_w);
-        if(i==last_idx)start=false;
-      }
-      else{
-        if(c=='<'){
-          fputc(c,f_w);
-          start=true;
-        }
-      }
-      i++;
-    }
-
-  fclose(f_r);
-  fclose(f_w);
-}
-
-void func(int sockfd)
+void serve(int sockfd)
 {
 	struct timeval tv;
 	tv.tv_sec = 2;
@@ -64,7 +36,27 @@ void func(int sockfd)
     fprintf(fp,"%s",buff);
   }
 	fclose(fp);
+	printf("---------FILE RECIEVED------------------\n");
+	//parse http request
 	parse_http_request(filename);
+	//parse xml
+	bmd * req=parse_xml("BMD.xml");
+	//store parsed xml in esb_request table
+	MYSQL *con = mysql_init(NULL);
+  if (con == NULL)
+  {
+      fprintf(stderr, "%s\n", mysql_error(con));
+      exit(1);
+  }
+
+  if (mysql_real_connect(con, mysql_host, mysql_user_name, mysql_user_password,
+          mysql_db_name, 0, NULL, 0) == NULL)
+  {
+        handle_error(con);
+  }
+
+  insert_one_in_esb_request(con,"1",req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"9999-12-31 23:59:59","-","Available","-");
+	//do all other operation in sequence
 	close(sockfd);
 }
 
@@ -107,7 +99,7 @@ int main()
 		printf("Server listening..\n");
 	len = sizeof(cli);
 
-	while (1) {
+	// while (1) {
 		// Accept the data packet from client and verification
 		connfd = accept(sockfd, (SA*)&cli, &len);
 		if (connfd < 0) {
@@ -118,8 +110,8 @@ int main()
 			printf("server acccept the client...\n");
 
 		// Function for chatting between client and server
-		func(connfd);
-	}
+		serve(connfd);
+	// }
 
 	// After chatting close the socket
 	close(sockfd);

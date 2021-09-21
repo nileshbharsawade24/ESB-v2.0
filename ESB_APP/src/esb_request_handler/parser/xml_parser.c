@@ -7,9 +7,7 @@
 
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
-
-
-
+#include "xml_parser.h"
 //Structure for BMD Message data
 typedef struct {
     char *MessageID;
@@ -65,7 +63,7 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
  */
 xmlChar* get_element_text(char *node_xpath, xmlDocPtr doc) {
     xmlChar *node_text;
-    xmlXPathObjectPtr result = get_nodes_at_xpath(doc, 
+    xmlXPathObjectPtr result = get_nodes_at_xpath(doc,
         (xmlChar*)node_xpath);
     if (result) {
         xmlNodeSetPtr nodeset = result->nodesetval;
@@ -83,16 +81,15 @@ xmlChar* get_element_text(char *node_xpath, xmlDocPtr doc) {
 }
 
 
-int main(int argc, char **argv) {
-    char *docname = "/home/rohit/Camel/xml_parser/recieved_bmd.xml";
-    xmlDocPtr doc = load_xml_doc(docname);
-    printf("MessageID=%s\n", get_element_text("//MessageID", doc));
-    printf("Sender=%s\n", get_element_text("//Sender", doc));
-    printf("Destination=%s\n", get_element_text("//Destination", doc));
-    printf("MessageType=%s\n", get_element_text("//MessageType", doc));
-    printf("Payload=%s\n", get_element_text("//Payload", doc));
+bmd * parse_xml(char * filepath) {
+    xmlDocPtr doc = load_xml_doc(filepath);
+    // printf("MessageID=%s\n", get_element_text("//MessageID", doc));
+    // printf("Sender=%s\n", get_element_text("//Sender", doc));
+    // printf("Destination=%s\n", get_element_text("//Destination", doc));
+    // printf("MessageType=%s\n", get_element_text("//MessageType", doc));
+    // printf("Payload=%s\n", get_element_text("//Payload", doc));
 
-    msg_data *bmd_msg;
+    bmd * bmd_msg= malloc (sizeof (bmd));
 
     bmd_msg->MessageID= get_element_text("//MessageID", doc);
     bmd_msg->MessageType = get_element_text("//MessageType", doc);
@@ -104,9 +101,13 @@ int main(int argc, char **argv) {
     bmd_msg->Payload= get_element_text("//Payload", doc);
 
 
-    insert_data(bmd_msg); //sending data to insert this data into esb_request table
+    //insert_data(bmd_msg); //sending data to insert this data into esb_request table
 
     xmlFreeDoc(doc);
     xmlCleanupParser();
-    return 1;
+    return bmd_msg;
 }
+// int main(int argc, char const *argv[]) {
+//   bmd * b=parse_xml("../../BMD.xml");
+//   return 0;
+// }

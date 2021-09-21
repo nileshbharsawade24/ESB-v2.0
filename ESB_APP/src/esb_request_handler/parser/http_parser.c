@@ -2,13 +2,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "http_parser.h"
 
-char * parse_http_request(char const * input_fpath){
+void parse_http_request(char const * input_fpath){
   char * output_fpath="BMD.xml";
   FILE * f_r=fopen(input_fpath,"r");
   FILE * f_w=fopen(output_fpath,"w");
 
-  if (f_r == NULL)return "0";
+  if (f_r == NULL)return;
 
   int last_idx=-1;
   int i=0;
@@ -38,11 +39,11 @@ char * parse_http_request(char const * input_fpath){
 
   fclose(f_r);
   fclose(f_w);
-  return output_fpath;
 }
 
+/*
 int main(int argc, char const *argv[]) {
-  /* code */
-  printf("%s\n",parse_http_request("http_request.txt"));
+  parse_http_request("../../http_request.txt");
   return 0;
 }
+*/
