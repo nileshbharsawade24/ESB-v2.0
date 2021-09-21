@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 // ref : https://stackoverflow.com/questions/44068549/setting-socket-timeout-for-receive-function
 // ref : https://www.geeksforgeeks.org/tcp-server-client-implementation-in-c/
+=======
+
+>>>>>>> 4cc137b2d9137e4bcc10643066470eb0cb12e123
 #include <unistd.h>
 #include <stdio.h>
 #include <netdb.h>
@@ -12,16 +16,52 @@
 #define PORT 8889
 #define SA struct sockaddr
 
+<<<<<<< HEAD
 void func(int sockfd)
 {
 	struct timeval tv;
+=======
+
+ 
+// Function designed for chat between client and server.
+void func(int sockfd)
+{
+    // FILE* fp = fopen("test.txt","w");
+
+	// char buff[MAX];
+	// int n;
+
+    // struct timeval tv;
+	// tv.tv_sec = 2;
+	// setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+	// // infinite loop for chat
+    //  for (int i =0;i<5;i++) {
+	// 	bzero(buff, MAX);
+
+	// 	// read the message from client and copy it in buffer
+	// 	int x=read(sockfd, buff, sizeof(buff));
+	// 	printf("=========================================\n");
+	// 	// print buffer which contains the client contents
+	// 	printf("%s", buff);
+    //     fprintf(fp,"%s",buff);
+        
+	// }
+    // close(sockfd);
+    // fclose(fp);
+
+    struct timeval tv;
+>>>>>>> 4cc137b2d9137e4bcc10643066470eb0cb12e123
 	tv.tv_sec = 2;
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	char buff[MAX];
 	bzero(buff, MAX);
 	FILE * fp=fopen("test.txt","w");
 	fclose(fp);
+<<<<<<< HEAD
 	fp=fopen("test.txt","a");
+=======
+	fp=fopen("test.txt","w");
+>>>>>>> 4cc137b2d9137e4bcc10643066470eb0cb12e123
 	while (recv(sockfd, buff, MAX, 0)>=0) {
     fprintf(fp,"%s",buff);
   }
