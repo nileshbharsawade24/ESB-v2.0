@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> 321dfd26534674a8671b5ed538c19a479f7f8f7a
 #include <unistd.h>
 #include <stdio.h>
 #include <netdb.h>
@@ -21,7 +18,6 @@ void func(int sockfd)
 {
     // FILE* fp = fopen("test.txt","w");
 
-<<<<<<< HEAD
 	// char buff[MAX];
 	// int n;
 
@@ -56,14 +52,6 @@ void func(int sockfd)
   }
 	fclose(fp);
 	close(sockfd);
-=======
-		// read the message from client and copy it in buffer
-		int x=read(sockfd, buff, sizeof(buff));
-		printf("=========================================\n");
-		// print buffer which contains the client contents
-		printf("%s", buff);
-	}
->>>>>>> 321dfd26534674a8671b5ed538c19a479f7f8f7a
 }
 
 // Driver function
