@@ -8,9 +8,48 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <stdbool.h>
+
 #define MAX 102400
-#define PORT 8889
+#define PORT 8888
 #define SA struct sockaddr
+
+void parse_http_request(char const * input_fpath){
+  char * output_fpath="BMD.xml";
+  FILE * f_r=fopen(input_fpath,"r");
+  FILE * f_w=fopen(output_fpath,"w");
+
+  if (f_r == NULL)return;
+
+  int last_idx=-1;
+  int i=0;
+  char c;
+  while((c=fgetc(f_r))!=EOF){
+    if(c=='>')last_idx=i;
+    i++;
+  }
+
+  f_r=fopen(input_fpath,"r");
+  i=0;
+
+    bool start=false;
+    while((c=fgetc(f_r))!=EOF){
+      if(start){
+        fputc(c,f_w);
+        if(i==last_idx)start=false;
+      }
+      else{
+        if(c=='<'){
+          fputc(c,f_w);
+          start=true;
+        }
+      }
+      i++;
+    }
+
+  fclose(f_r);
+  fclose(f_w);
+}
 
 void func(int sockfd)
 {
@@ -19,13 +58,13 @@ void func(int sockfd)
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	char buff[MAX];
 	bzero(buff, MAX);
-	FILE * fp=fopen("test.txt","w");
-	fclose(fp);
-	fp=fopen("test.txt","a");
+	char * filename="http_request.txt";
+	FILE * fp=fopen(filename,"w");
 	while (recv(sockfd, buff, MAX, 0)>=0) {
     fprintf(fp,"%s",buff);
   }
 	fclose(fp);
+	parse_http_request(filename);
 	close(sockfd);
 }
 
