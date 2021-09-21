@@ -54,8 +54,8 @@ int main(int argc, char **argv)
   			"route_id INT,"
   			"sender VARCHAR(45),"
   			"destination VARCHAR(45),"
-  			"message_type VARCHAR(45),"
-  			"is_active TINYINT,"
+  			"message_type VARCHAR(45) NOT NULL,"
+  			"is_active TINYINT NOT NULL,"
         "PRIMARY KEY (route_id,sender,destination),"
         "UNIQUE (sender,destination,message_type)"
   			 ")")){
@@ -64,14 +64,14 @@ int main(int argc, char **argv)
 
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS esb_request ("
   			"id INT PRIMARY KEY,"
-  			"sender_id VARCHAR(45),"
-  			"dest_id VARCHAR(45),"
-  			"message_type VARCHAR(45),"
-  			"reference_id VARCHAR(45),"
-  			"message_id VARCHAR(45),"
-  			"received_on DATETIME,"
+  			"sender_id VARCHAR(45) NOT NULL,"
+  			"dest_id VARCHAR(45) NOT NULL,"
+  			"message_type VARCHAR(45) NOT NULL,"
+  			"reference_id VARCHAR(45) NOT NULL,"
+  			"message_id VARCHAR(45) NOT NULL,"
+  			"received_on DATETIME NOT NULL,"
   			"data_location TEXT,"
-  			"status VARCHAR(20),"
+  			"status VARCHAR(20) NOT NULL,"
   			"status_details TEXT"
   			 ")")){
         handle_error(con);
@@ -79,16 +79,17 @@ int main(int argc, char **argv)
 
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transform_config ("
   			"id INT PRIMARY KEY,"
-  			"route_id INT,"
-  			"config_key VARCHAR(45),"
+  			"route_id INT NOT NULL,"
+  			"config_key VARCHAR(45) NOT NULL,"
   			"config_value TEXT,"
-        "UNIQUE (route_id,config_key)"
+        "UNIQUE (route_id,config_key),"
+        "FOREIGN KEY (route_id) REFERENCES routes(route_id)"
   			 ")")){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE INDEX route_idx"
-                       "ON transform_config (route_id)"){
+  if (mysql_query(con, "CREATE INDEX route_idx "
+                       "ON transform_config (route_id)")){
         handle_error(con);
   }
 
@@ -97,13 +98,14 @@ int main(int argc, char **argv)
   			"route_id INT,"
   			"config_key VARCHAR(45),"
   			"config_value TEXT,"
-        "UNIQUE (route_id,config_key)"
+        "UNIQUE (route_id,config_key),"
+        "FOREIGN KEY (route_id) REFERENCES routes(route_id)"
   			 ")")){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE INDEX route_idx"
-                       "ON transport_config (route_id)"){
+  if (mysql_query(con, "CREATE INDEX route_idx "
+                       "ON transport_config (route_id)")){
         handle_error(con);
   }
 
