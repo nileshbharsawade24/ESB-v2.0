@@ -8,6 +8,23 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
+
+
+//Structure for BMD Message data
+typedef struct {
+    char *MessageID;
+    char *MessageType;
+    char *Sender;
+    char *Destination;
+    char *CreationDateTime;
+    char *Signature;
+    char *ReferenceID;
+    char *Payload;
+
+
+}msg_data;
+
+
 xmlDocPtr load_xml_doc(char *xml_file_path) {
     xmlDocPtr doc = xmlParseFile(xml_file_path);
     if (doc == NULL) {
@@ -74,6 +91,21 @@ int main(int argc, char **argv) {
     printf("Destination=%s\n", get_element_text("//Destination", doc));
     printf("MessageType=%s\n", get_element_text("//MessageType", doc));
     printf("Payload=%s\n", get_element_text("//Payload", doc));
+
+    msg_data *bmd_msg;
+
+    bmd_msg->MessageID= get_element_text("//MessageID", doc);
+    bmd_msg->MessageType = get_element_text("//MessageType", doc);
+    bmd_msg->Sender= get_element_text("//Sender", doc);
+    bmd_msg->Destination= get_element_text("//Destination", doc);
+    bmd_msg->CreationDateTime= get_element_text("//CreationDateTime", doc);
+    bmd_msg->Signature= get_element_text("//Signature", doc);
+    bmd_msg->ReferenceID= get_element_text("//ReferenceID", doc);
+    bmd_msg->Payload= get_element_text("//Payload", doc);
+
+
+    insert_data(bmd_msg); //sending data to insert this data into esb_request table
+
     xmlFreeDoc(doc);
     xmlCleanupParser();
     return 1;
