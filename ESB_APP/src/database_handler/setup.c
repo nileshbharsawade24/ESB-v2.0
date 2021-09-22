@@ -1,9 +1,8 @@
-//Author : Deepak kumar
-//Designation : Senior Member Technical
-//Employer : Broadridge
-
 /*
-This c program will setup the database and tables if they don't exist.
+Author : Deepak kumar
+Designation : Senior Member Technical
+Employer : Broadridge
+Description : This c program will setup the database and tables if they don't exist.
 NOTE1 : To run this program make sure to your mysql user have all permission on atleast `CAMEL_DB` database.
 NOTE2 : change mysql_user_name and my_sql_password appropritely or just create one same as these.
 */
@@ -16,15 +15,16 @@ NOTE2 : change mysql_user_name and my_sql_password appropritely or just create o
 #define mysql_user_password "test_password"
 #define mysql_host "localhost"
 
-
+//this function will handle error given mysql connection `connection`
 void handle_error(MYSQL *connection){
       fprintf(stderr, "%s\n", mysql_error(connection));
       mysql_close(connection);
       exit(1);
 }
 
-int main(int argc, char **argv)
-{
+//setup function will setup the database and table with approprite schema and indexes
+void setup(){
+
   MYSQL *con = mysql_init(NULL);
 
   if (con == NULL)
@@ -110,5 +110,11 @@ int main(int argc, char **argv)
   }
 
   mysql_close(con);
-  exit(0);
+}
+
+int main(int argc, char **argv)
+{
+  //run the setup code
+  setup();
+  return 0;
 }

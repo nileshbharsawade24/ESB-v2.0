@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 /*
 / Author : Rohit Kumar Bhamu
 / Designation : Senior Technical Member
@@ -21,6 +23,7 @@ typedef struct {
 } bmd;
 */
 
+>>>>>>> b3e04b6f6b9b073615dd607e6acd78313c3032d1
 //Structure for BMD Message data
 typedef struct {
     const char *MessageID;

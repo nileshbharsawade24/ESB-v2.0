@@ -1,11 +1,8 @@
-//Author : Deepak kumar
-//Designation : Senior Member Technical
-//Employer : Broadridge
-
 /*
-This c program will setup the database and tables if they don't exist.
-NOTE1 : To run this program make sure to your mysql user have all permission on atleast `CAMEL_DB` database.
-NOTE2 : change mysql_user_name and my_sql_password appropritely or just create one same as these.
+Author : Deepak kumar
+Designation : Senior Member Technical
+Employer : Broadridge
+Description : This c program access the mysql database 'CAMEL_DB' and perform selection,insertion and updation
 */
 
 #include <mysql.h>
@@ -16,36 +13,35 @@ NOTE2 : change mysql_user_name and my_sql_password appropritely or just create o
 
 #include "database_access.h"
 
-// #define mysql_user_name "test_user"
-// #define mysql_user_password "test_password"
-// #define mysql_host "localhost"
-// #define mysql_db_name "CAMEL_DB"
-
-
+// handle error based on mysql connection
 void handle_error(MYSQL *connection){
       fprintf(stderr, "%s\n", mysql_error(connection));
       mysql_close(connection);
       exit(1);
 }
 
-bool is_field_int(const char * str){
+//check whether column is int or not
+bool is_field_int(const char* const str){
       if(!strcmp(str,"id"))return true;
       if(!strcmp(str,"route_id"))return true;
       if(!strcmp(str,"is_active"))return true;
       return false;
 }
 
-bool is_null(const char * str){
+//check string `str` is null or not
+bool is_null(const char* const str){
       return !strcmp(str,"NULL");
 }
 
-bool is_number(const char * str){
+//check string `str` is number or not
+bool is_number(const char* const str){
   int length = strlen (str);
   for (int i=0;i<length; i++)if (!isdigit(str[i]))return false;
   return true;
 }
 
-void do_binding(MYSQL_BIND * B,const char * key,const char * value){
+//perform bindig on B based on key and its value given mysql connection
+void do_binding(MYSQL_BIND * B,const char* const key,const char* const value){
  if(is_field_int(key)){
    if(!is_number(value)){
      fprintf(stderr, "ERROR : Key `%s` is a number while value `%s` is not a number.\n",key,value);
@@ -67,7 +63,8 @@ void do_binding(MYSQL_BIND * B,const char * key,const char * value){
  }
 }
 
-void update_single_field(MYSQL * conn, const char* table_name, const char* key_to_set, const char* value_to_set, const char* key_to_find, const char* value_to_find){
+//update single field based on single condition given mysql connection and values
+void update_single_field(MYSQL * conn, const char* const table_name, const char* const key_to_set, const char* const value_to_set, const char* const key_to_find, const char* const value_to_find){
   MYSQL_STMT *stmt=mysql_stmt_init(conn);
   MYSQL_BIND bind[2];
   memset(bind,0,sizeof(bind));
@@ -88,7 +85,8 @@ void update_single_field(MYSQL * conn, const char* table_name, const char* key_t
   }
 }
 
-char * select_single_field(MYSQL * conn,const char* table_name,const char* find,const char* key,const char* value){
+//select single field based on single condition given mysql connection and values
+char * select_single_field(MYSQL * conn,const char* const table_name,const char* const find,const char* const key,const char* const value){
       char buffer[1024];
       if(is_field_int(key)){
             char * query_str = "SELECT %s from %s where %s=%s";
@@ -114,7 +112,8 @@ char * select_single_field(MYSQL * conn,const char* table_name,const char* find,
       return result_row[0]; //returning first row and first column value
 }
 
-void insert_one_in_esb_request(MYSQL * conn,const char * f1,const char * f2,const char * f3,const char * f4,const char * f5,const char * f6,const char * f7,const char * f8,const char * f9,const char * f10){
+//insert ordered tuple in esb_request table given mysql connection and values
+void insert_one_in_esb_request(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10){
   char buffer[1024];
   char * query_str = "INSERT INTO esb_request VALUES (%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\")";
   sprintf(buffer, query_str,atoi(f1),f2,f3,f4,f5,f6,f7,f8,f9,f10);
@@ -124,7 +123,8 @@ void insert_one_in_esb_request(MYSQL * conn,const char * f1,const char * f2,cons
   }
 }
 
-void insert_one_in_routes(MYSQL * conn,const char * f1,const char * f2,const char * f3,const char * f4,const char * f5){
+//insert ordered tuple in routes table given mysql connection and values
+void insert_one_in_routes(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4,const char* const f5){
   char buffer[1024];
   char * query_str = "INSERT INTO routes VALUES (%d,\"%s\",\"%s\",\"%s\",%d)";
   sprintf(buffer, query_str,atoi(f1),f2,f3,f4,atoi(f5));
@@ -134,7 +134,8 @@ void insert_one_in_routes(MYSQL * conn,const char * f1,const char * f2,const cha
   }
 }
 
-void insert_one_in_transport_config(MYSQL * conn,const char * f1,const char * f2,const char * f3,const char * f4){
+//insert ordered tuple in transport_config table given mysql connection and values
+void insert_one_in_transport_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
   char buffer[1024];
   char * query_str = "INSERT INTO transport_config VALUES (%d,%d,\"%s\",\"%s\")";
   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
@@ -144,7 +145,8 @@ void insert_one_in_transport_config(MYSQL * conn,const char * f1,const char * f2
   }
 }
 
-void insert_one_in_transform_config(MYSQL * conn,const char * f1,const char * f2,const char * f3,const char * f4){
+//insert ordered tuple in transform_config table given mysql connection and values
+void insert_one_in_transform_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
   char buffer[1024];
   char * query_str = "INSERT INTO transform_config VALUES (%d,%d,\"%s\",\"%s\")";
   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
