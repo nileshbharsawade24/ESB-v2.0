@@ -8,7 +8,10 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include "xml_parser.h"
-//Structure for BMD Message data
+
+
+//Structure for BMD Message data : Subject to change , As of now we are addding
+//important fields of BMD file which we want to use 
 typedef struct {
     char *MessageID;
     char *MessageType;
@@ -22,6 +25,8 @@ typedef struct {
 
 }msg_data;
 
+
+//it will load xml document in xml document object
 
 xmlDocPtr load_xml_doc(char *xml_file_path) {
     xmlDocPtr doc = xmlParseFile(xml_file_path);
@@ -43,12 +48,15 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
         printf("ERROR: Failed to create xpath context from the XML document.\n");
         return NULL;
     }
-    xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
+    xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);  //save particular data in result object
     xmlXPathFreeContext(context);
+
+    //there is no path 
     if (result == NULL) {
         printf("ERROR: Failed to evaluate xpath expression.\n");
         return NULL;
     }
+
     if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
         xmlXPathFreeObject(result);
         printf("No matching nodes found at the xpath.\n");
@@ -83,14 +91,19 @@ xmlChar* get_element_text(char *node_xpath, xmlDocPtr doc) {
 
 bmd * parse_xml(char * filepath) {
     xmlDocPtr doc = load_xml_doc(filepath);
+    /*
+     used for testing purpose 
+    */
     // printf("MessageID=%s\n", get_element_text("//MessageID", doc));
     // printf("Sender=%s\n", get_element_text("//Sender", doc));
     // printf("Destination=%s\n", get_element_text("//Destination", doc));
     // printf("MessageType=%s\n", get_element_text("//MessageType", doc));
     // printf("Payload=%s\n", get_element_text("//Payload", doc));
 
-    bmd * bmd_msg= malloc (sizeof (bmd));
+    bmd * bmd_msg= malloc (sizeof (bmd)); //intializing bmd_msg object
 
+
+    //storing value in bmd_bsg object
     bmd_msg->MessageID= get_element_text("//MessageID", doc);
     bmd_msg->MessageType = get_element_text("//MessageType", doc);
     bmd_msg->Sender= get_element_text("//Sender", doc);
