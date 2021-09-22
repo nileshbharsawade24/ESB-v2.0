@@ -2,10 +2,12 @@
 ESB Application
 
 # Installation required -
+    sudo apt update
+    sudo apt install mysql-server
     sudo apt install libmysqlclient-dev
     sudo apt-get install libxml2-dev
     make clean
-Also make sure you have mysql installed in your system. <br />
+<!-- Also make sure you have mysql installed in your system. <br /> -->
 
 # How to run -
     make clean
