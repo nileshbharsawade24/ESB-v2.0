@@ -8,10 +8,10 @@ ESB Application
 Also make sure you have mysql installed in your system. <br />
 
 # How to run -
+    make clean
     make all
     ./run
-    make clean
-
+    
 # Contributer 
 [Deepak Kumar](https://github.com/deepakjnv880)  
 [Rohit kumar](https://github.com/rohitbhamu)  
