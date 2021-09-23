@@ -6,7 +6,7 @@ ESB Application of Camel group
     sudo apt install mysql-server
     sudo apt install libmysqlclient-dev
     sudo apt install libxml2-dev
-    
+
 <!-- Also make sure you have mysql installed in your system. <br /> -->
 
 # Layout overview -
@@ -22,8 +22,8 @@ ESB Application of Camel group
 
 # How to run -
 First go to ESB_APP/src.</br>
-Then setup your database and tables with appropriate schema and index and also fill manual data with following commands :
-    
+Then setup your database and tables with appropriate schema and index and also fill manual data with following commands (or use mysql dump):
+
     make clean
     make setup
     ./setup
@@ -39,4 +39,3 @@ Then run the esb application with following commands :
 [Rohit bhamu](https://github.com/rohitbhamu)  
 
 # Thanks for visiting :slightly_smiling_face: .
-

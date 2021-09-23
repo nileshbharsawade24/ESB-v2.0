@@ -141,7 +141,7 @@ int main()
 			 printf("server acccept the client with id %d ...\n",connfd);
 
 		 //----create child thread----
-		 if(pthread_create(&threads[count],NULL,&serve,&connfd)!=0){
+		 if(pthread_create(&threads[count%NUM_THREADS],NULL,&serve,&connfd)!=0){
 			 printf ("ERROR: child thread not created\n");
 			 exit(-1);
 		 }
