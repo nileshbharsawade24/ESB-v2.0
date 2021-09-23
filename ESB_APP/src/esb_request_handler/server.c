@@ -79,6 +79,7 @@ void serve(int sockfd)
 	//do all other operation in sequence...
 	//close the client socket
 	close(sockfd);
+	pthread_exit(NULL);
 }
 
 // Driver function
@@ -152,11 +153,14 @@ int main()
 			}
 		}
 		 
-		 pthread_exit(NULL);
+		 
 		// Function for chatting between client and server
 		serve(connfd);
 	// }
 
 	// After chatting close the socket
 	close(sockfd);
+	
+	/*this is the last thing main() should do */
+	pthread_exit(NULL);
 }
