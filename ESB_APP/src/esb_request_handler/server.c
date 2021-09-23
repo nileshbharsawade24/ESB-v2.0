@@ -127,6 +127,8 @@ int main()
 
 	printf("\n============= WELCOME IN CAMEL ESB ==================\n\n");
 
+  unsigned int count=0;
+
 	//keep listening for new clients
 	while(1){
 		 // Accept the data packet from client and verification
@@ -139,10 +141,11 @@ int main()
 			 printf("server acccept the client with id %d ...\n",connfd);
 
 		 //----create child thread----
-		 if(pthread_create(&threads[i],NULL,&serve,&connfd)!=0){
+		 if(pthread_create(&threads[count],NULL,&serve,&connfd)!=0){
 			 printf ("ERROR: child thread not created\n");
 			 exit(-1);
 		 }
+     count++;
   }
 
 	// close the server socket
