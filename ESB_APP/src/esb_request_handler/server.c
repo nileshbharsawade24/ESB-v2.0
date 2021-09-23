@@ -128,7 +128,7 @@ int main()
 	printf("\n============= WELCOME IN CAMEL ESB ==================\n\n");
 
 	//keep listening for new clients
-	for(int i=0;i<NUM_THREADS;i++){
+	while(1){
 		 // Accept the data packet from client and verification
 		 connfd = accept(sockfd, (SA*)&cli, &len);
 		 if (connfd < 0) {
