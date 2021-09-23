@@ -10,3 +10,4 @@
 | 20 Sep 2021  | HTTP request handling                                       | HTTP request handling                                       |
 | 21 Sep 2021  | socket server creation and Connect different modules        | socket server creation and Connect different modules        |
 | 22 Sep 2021  | Test scenario planning and code commenting                  | Test scenario planning and code commenting                  |
+| 23 Sep 2021  | Client thread creation and manual table filling             | Database access files modification and manual table filling   |

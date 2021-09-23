@@ -51,7 +51,7 @@ void setup(){
   }
 
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS routes ("
-  			"route_id INT,"
+  			"route_id INT AUTO_INCREMENT,"
   			"sender VARCHAR(45),"
   			"destination VARCHAR(45),"
   			"message_type VARCHAR(45) NOT NULL,"
@@ -62,8 +62,12 @@ void setup(){
         handle_error(con);
   }
 
+  if (mysql_query(con, "ALTER TABLE routes AUTO_INCREMENT = 1")){
+        handle_error(con);
+  }
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS esb_request ("
-  			"id INT PRIMARY KEY,"
+  			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"sender_id VARCHAR(45) NOT NULL,"
   			"dest_id VARCHAR(45) NOT NULL,"
   			"message_type VARCHAR(45) NOT NULL,"
@@ -77,14 +81,23 @@ void setup(){
         handle_error(con);
   }
 
+  if (mysql_query(con, "ALTER TABLE esb_request AUTO_INCREMENT = 1")){
+        handle_error(con);
+  }
+
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transform_config ("
-  			"id INT PRIMARY KEY,"
+  			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"route_id INT NOT NULL,"
   			"config_key VARCHAR(45) NOT NULL,"
   			"config_value TEXT,"
         "UNIQUE (route_id,config_key),"
         "FOREIGN KEY (route_id) REFERENCES routes(route_id)"
   			 ")")){
+        handle_error(con);
+  }
+  // else {return};
+
+  if (mysql_query(con, "ALTER TABLE transform_config AUTO_INCREMENT = 1")){
         handle_error(con);
   }
 
@@ -94,7 +107,7 @@ void setup(){
   }
 
   if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transport_config ("
-  			"id INT PRIMARY KEY,"
+  			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"route_id INT,"
   			"config_key VARCHAR(45),"
   			"config_value TEXT,"
@@ -104,8 +117,43 @@ void setup(){
         handle_error(con);
   }
 
+  if (mysql_query(con, "ALTER TABLE transport_config AUTO_INCREMENT = 1")){
+        handle_error(con);
+  }
+
   if (mysql_query(con, "CREATE INDEX route_idx "
                        "ON transport_config (route_id)")){
+        handle_error(con);
+  }
+
+  //manual data filling
+  if (mysql_query(con, "insert into routes (sender,destination,message_type,is_active) values "
+                       "('user_app_880','nationality_predictor_880','predict_nationality',1)"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transform_config (route_id,config_key,config_value) values "
+                       "(1,'format','json')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(1,'api','https://api.nationalize.io')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(1,'transport_type','get')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(1,'method','http')"
+                       )){
         handle_error(con);
   }
 

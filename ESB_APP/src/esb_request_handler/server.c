@@ -24,7 +24,7 @@ Note : Configure the port and database credential appropriately
 #include "../database_handler/database_access.h"
 
 #define MAX 102400
-#define PORT 8889
+#define PORT 8888
 #define PATH_MAX 50
 #define NUM_THREADS 10
 #define SA struct sockaddr
@@ -34,8 +34,8 @@ Note : Configure the port and database credential appropriately
 #define mysql_db_name "CAMEL_DB"
 
 //this will serve to a client given socket file descriptor 'sockfd'
-void serve(int sockfd)
-{
+void *serve(void* fd) {
+  int sockfd=*(int*)fd;
 	struct timeval tv;
 	tv.tv_sec = 2; //2 second timer
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
@@ -75,7 +75,7 @@ void serve(int sockfd)
   }
 
 	//inserting a tuple in esb_request table with given fields
-  insert_one_in_esb_request(con,"1",req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"9999-12-31 23:59:59","-","Available","-");
+  insert_one_in_esb_request(con,req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","-");
 	//do all other operation in sequence...
 	//close the client socket
 	close(sockfd);
@@ -107,60 +107,47 @@ int main()
 
 	// Binding newly created socket to given IP and verification
 	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
-		printf("socket bind failed...\n");
+		printf("Server socket bind failed...\n");
 		exit(0);
 	}
 	else
-		printf("Socket successfully binded..\n");
+		printf("Server socket successfully binded..\n");
 
 	// Now server is ready to listen and verification
 	if ((listen(sockfd, 5)) != 0) {
-		printf("Listen failed...\n");
+		printf("Server Listen failed...\n");
 		exit(0);
 	}
 	else
 		printf("Server listening..\n");
 	len = sizeof(cli);
 
+	//defining thread
+	pthread_t threads[NUM_THREADS];
+
+	printf("\n============= WELCOME IN CAMEL ESB ==================\n\n");
+
 	//keep listening for new clients
-	 while (1) {
-		// Accept the data packet from client and verification
-		printf("Server is listening...\n");
-		connfd = accept(sockfd, (SA*)&cli, &len);
-		if (connfd < 0) {
-			printf("server acccept failed...\n");
-			exit(0);
-		}
-		else
-			printf("server acccept the client...\n");
+	for(int i=0;i<NUM_THREADS;i++){
+		 // Accept the data packet from client and verification
+		 connfd = accept(sockfd, (SA*)&cli, &len);
+		 if (connfd < 0) {
+			 printf("server acccept failed...\n");
+			 exit(0);
+		 }
+		 else
+			 printf("server acccept the client with id %d ...\n",connfd);
 
+		 //----create child thread----
+		 if(pthread_create(&threads[i],NULL,&serve,&connfd)!=0){
+			 printf ("ERROR: child thread not created\n");
+			 exit(-1);
+		 }
+  }
 
-
-		//----Mutrithreading from here----
-		
-		pthread_t threads[NUM_THREADS];
-		int rc; //return code of thread
-		long t;
-
-		for(t=0;t<NUM_THREADS;t++){
-			printf("creaed child thread \n");
-			//Child thread created
-			rc=pthread_create(&threads[t],NULL,serve,(void *) t);
-			if(rc){
-				printf ("ERROR; return code from pthread_create() is %d\n",rc);
-				exit(-1);
-
-			}
-		}
-		 
-		 
-		// Function for chatting between client and server
-		serve(connfd);
-	// }
-
-	// After chatting close the socket
+	// close the server socket
 	close(sockfd);
-	
+
 	/*this is the last thing main() should do */
 	pthread_exit(NULL);
 }

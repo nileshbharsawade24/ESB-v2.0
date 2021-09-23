@@ -79,7 +79,7 @@ void update_single_field(MYSQL * conn, const char* const table_name, const char*
 
   mysql_stmt_bind_param(stmt, bind);
 
-  printf("--> QUERY : %s\n",buffer);
+  printf("\n--> QUERY : %s\n\n",buffer);
   if(mysql_stmt_execute(stmt)!=0){
     handle_error(conn);
   }
@@ -100,7 +100,7 @@ char * select_single_field(MYSQL * conn,const char* const table_name,const char*
             char * query_str = "SELECT %s from %s where %s=\"%s\"";
             sprintf(buffer, query_str,find,table_name,key,value);
       }
-      printf("--> QUERY : %s\n",buffer);
+      printf("\n--> QUERY : %s\n\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
@@ -113,48 +113,50 @@ char * select_single_field(MYSQL * conn,const char* const table_name,const char*
 }
 
 //insert ordered tuple in esb_request table given mysql connection and values
-void insert_one_in_esb_request(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10){
+void insert_one_in_esb_request(MYSQL * conn,const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10){
   char buffer[1024];
-  char * query_str = "INSERT INTO esb_request VALUES (%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\")";
-  sprintf(buffer, query_str,atoi(f1),f2,f3,f4,f5,f6,f7,f8,f9,f10);
-  printf("--> QUERY : %s\n",buffer);
+  char * query_str = "INSERT INTO esb_request"
+                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,status_details) "
+                     "VALUES (\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%s,\"%s\",\"%s\",\"%s\")";
+  sprintf(buffer, query_str,f2,f3,f4,f5,f6,f7,f8,f9,f10);
+  printf("\n--> QUERY : %s\n\n",buffer);
   if (mysql_query(conn, buffer)){
     handle_error(conn);
   }
 }
 
-//insert ordered tuple in routes table given mysql connection and values
-void insert_one_in_routes(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4,const char* const f5){
-  char buffer[1024];
-  char * query_str = "INSERT INTO routes VALUES (%d,\"%s\",\"%s\",\"%s\",%d)";
-  sprintf(buffer, query_str,atoi(f1),f2,f3,f4,atoi(f5));
-  printf("--> QUERY : %s\n",buffer);
-  if (mysql_query(conn, buffer)){
-    handle_error(conn);
-  }
-}
-
-//insert ordered tuple in transport_config table given mysql connection and values
-void insert_one_in_transport_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
-  char buffer[1024];
-  char * query_str = "INSERT INTO transport_config VALUES (%d,%d,\"%s\",\"%s\")";
-  sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
-  printf("--> QUERY : %s\n",buffer);
-  if (mysql_query(conn, buffer)){
-    handle_error(conn);
-  }
-}
-
-//insert ordered tuple in transform_config table given mysql connection and values
-void insert_one_in_transform_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
-  char buffer[1024];
-  char * query_str = "INSERT INTO transform_config VALUES (%d,%d,\"%s\",\"%s\")";
-  sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
-  printf("--> QUERY : %s\n",buffer);
-  if (mysql_query(conn, buffer)){
-    handle_error(conn);
-  }
-}
+// //insert ordered tuple in routes table given mysql connection and values
+// void insert_one_in_routes(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4,const char* const f5){
+//   char buffer[1024];
+//   char * query_str = "INSERT INTO routes VALUES (%d,\"%s\",\"%s\",\"%s\",%d)";
+//   sprintf(buffer, query_str,atoi(f1),f2,f3,f4,atoi(f5));
+//   printf("\n--> QUERY : %s\n\n",buffer);
+//   if (mysql_query(conn, buffer)){
+//     handle_error(conn);
+//   }
+// }
+//
+// //insert ordered tuple in transport_config table given mysql connection and values
+// void insert_one_in_transport_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
+//   char buffer[1024];
+//   char * query_str = "INSERT INTO transport_config VALUES (%d,%d,\"%s\",\"%s\")";
+//   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
+//   printf("\n--> QUERY : %s\n\n",buffer);
+//   if (mysql_query(conn, buffer)){
+//     handle_error(conn);
+//   }
+// }
+//
+// //insert ordered tuple in transform_config table given mysql connection and values
+// void insert_one_in_transform_config(MYSQL * conn,const char* const f1,const char* const f2,const char* const f3,const char* const f4){
+//   char buffer[1024];
+//   char * query_str = "INSERT INTO transform_config VALUES (%d,%d,\"%s\",\"%s\")";
+//   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
+//   printf("\n--> QUERY : %s\n\n",buffer);
+//   if (mysql_query(conn, buffer)){
+//     handle_error(conn);
+//   }
+// }
 
 /*
 int main(int argc, char **argv)
