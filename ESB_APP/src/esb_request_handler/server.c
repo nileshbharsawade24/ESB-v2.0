@@ -16,13 +16,15 @@ Note : Configure the port and database credential appropriately
 #include <sys/types.h>
 #include <stdbool.h>
 #include <mysql.h>
+#include <time.h>
 
 #include "parser/http_parser.h"
 #include "parser/xml_parser.h"
 #include "../database_handler/database_access.h"
 
 #define MAX 102400
-#define PORT 8888
+#define PORT 8889
+#define PATH_MAX 50
 #define SA struct sockaddr
 #define mysql_user_name "test_user"
 #define mysql_user_password "test_password"
@@ -37,8 +39,13 @@ void serve(int sockfd)
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	char buff[MAX];//this buff will store the data from http request and we will use it to write in .txt file
 	bzero(buff, MAX);
-	char * filename="http_request.txt";
-	FILE * fp=fopen(filename,"w"); //opening http_request.tt file in writing mode
+	unsigned long tm=(unsigned long)time(NULL);
+	char *filename_http = malloc(PATH_MAX * sizeof(char));
+	char *filename_xml = malloc(PATH_MAX * sizeof(char));
+	char *base_dir = "./tmp";
+	sprintf(filename_http, "%s/HTTP_REQUEST_%lu.txt", base_dir, tm);
+	sprintf(filename_xml, "%s/BMD_%lu.xml", base_dir, tm);
+	FILE * fp=fopen(filename_http,"w"); //opening http_request.tt file in writing mode
 
 	while (recv(sockfd, buff, MAX, 0)>=0) {
     fprintf(fp,"%s",buff); //writing in file
@@ -46,9 +53,9 @@ void serve(int sockfd)
 	fclose(fp);
 	printf("---------FILE RECIEVED------------------\n");
 	//parse http request
-	parse_http_request(filename);
+	parse_http_request(filename_http,filename_xml);
 	//parse xml
-	bmd * req=parse_xml("BMD.xml");
+	bmd * req=parse_xml(filename_xml);
 	//store parsed xml in esb_request table
 	MYSQL *con = mysql_init(NULL);
 
@@ -75,6 +82,7 @@ void serve(int sockfd)
 // Driver function
 int main()
 {
+
 	int sockfd, connfd, len;
 	struct sockaddr_in servaddr, cli;
 

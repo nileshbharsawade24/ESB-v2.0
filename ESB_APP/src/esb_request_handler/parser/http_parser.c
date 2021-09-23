@@ -12,8 +12,7 @@ Description : This c program will perform parsing on http request output BMD.xml
 #include "http_parser.h"
 
 //parse http request present in filepath `input_fpath` and output BMD.xml
-void parse_http_request(const char* const input_fpath){
-  char * output_fpath="BMD.xml";
+void parse_http_request(const char* const input_fpath,const char* const output_fpath){
   FILE * f_r=fopen(input_fpath,"r");
   FILE * f_w=fopen(output_fpath,"w");
 

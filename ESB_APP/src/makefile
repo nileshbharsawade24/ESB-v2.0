@@ -8,6 +8,7 @@ Description : This is makefile with two main target `all` and `setup` with `clea
 all: server.o http_parser.o xml_parser.o database_access.o
 	gcc -o run http_parser.o xml_parser.o server.o database_access.o -lxml2 `mysql_config --libs`
 	rm *.o
+	mkdir -p tmp
 server.o: esb_request_handler/server.c
 	gcc -c esb_request_handler/server.c -I/usr/include/mysql/
 http_parser.o: esb_request_handler/parser/http_parser.c
@@ -21,4 +22,4 @@ setup: database_handler/setup.c
 	gcc -I/usr/include/mysql/ -o setup database_handler/setup.c `mysql_config --libs`
 
 clean:
-	rm setup run *.o BMD.xml http_request.txt
+	rm setup run *.o
