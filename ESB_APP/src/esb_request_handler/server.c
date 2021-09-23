@@ -1,5 +1,4 @@
 /*
-<<<<<<< HEAD
 Author : Deepak kumar and Rohit bhamu
 Designation : Senior Member Technical
 Employer : Broadridge
@@ -7,14 +6,6 @@ Description : This c program will act like a server
 Note : Configure the port and database credential appropriately
 */
 
-=======
-/ Author : Rohit Kumar Bhamu
-/ Designation : Senior Technical Member
-/ Employer : Broadridge
-*/
-// ref : https://stackoverflow.com/questions/44068549/setting-socket-timeout-for-receive-function
-// ref : https://www.geeksforgeeks.org/tcp-server-client-implementation-in-c/
->>>>>>> b3e04b6f6b9b073615dd607e6acd78313c3032d1
 #include <unistd.h>
 #include <stdio.h>
 #include <netdb.h>
@@ -42,13 +33,13 @@ Note : Configure the port and database credential appropriately
 void serve(int sockfd)
 {
 	struct timeval tv;
-	tv.tv_sec = 2; //2 second timer 
+	tv.tv_sec = 2; //2 second timer
 	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	char buff[MAX];//this buff will store the data from http request and we will use it to write in .txt file
 	bzero(buff, MAX);
 	char * filename="http_request.txt";
 	FILE * fp=fopen(filename,"w"); //opening http_request.tt file in writing mode
-	
+
 	while (recv(sockfd, buff, MAX, 0)>=0) {
     fprintf(fp,"%s",buff); //writing in file
   }
@@ -66,20 +57,15 @@ void serve(int sockfd)
       fprintf(stderr, "%s\n", mysql_error(con));
       exit(1);
   }
-<<<<<<< HEAD
-=======
 
 	//connecting to db
->>>>>>> b3e04b6f6b9b073615dd607e6acd78313c3032d1
   if (mysql_real_connect(con, mysql_host, mysql_user_name, mysql_user_password,
           mysql_db_name, 0, NULL, 0) == NULL)
   {
         handle_error(con);
   }
-<<<<<<< HEAD
-=======
+
 	//inserting a tuple in esb_request table with given fields
->>>>>>> b3e04b6f6b9b073615dd607e6acd78313c3032d1
   insert_one_in_esb_request(con,"1",req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"9999-12-31 23:59:59","-","Available","-");
 	//do all other operation in sequence...
 	//close the client socket
