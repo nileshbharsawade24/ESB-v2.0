@@ -17,6 +17,7 @@ Note : Configure the port and database credential appropriately
 #include <stdbool.h>
 #include <mysql.h>
 #include <time.h>
+#include<pthread.h>
 
 #include "parser/http_parser.h"
 #include "parser/xml_parser.h"
@@ -25,6 +26,7 @@ Note : Configure the port and database credential appropriately
 #define MAX 102400
 #define PORT 8889
 #define PATH_MAX 50
+#define NUM_THREADS 10
 #define SA struct sockaddr
 #define mysql_user_name "test_user"
 #define mysql_user_password "test_password"
@@ -119,8 +121,10 @@ int main()
 		printf("Server listening..\n");
 	len = sizeof(cli);
 
-	// while (1) {
+	//keep listening for new clients
+	 while (1) {
 		// Accept the data packet from client and verification
+		printf("Server is listening...\n");
 		connfd = accept(sockfd, (SA*)&cli, &len);
 		if (connfd < 0) {
 			printf("server acccept failed...\n");
@@ -129,6 +133,26 @@ int main()
 		else
 			printf("server acccept the client...\n");
 
+
+
+		//----Mutrithreading from here----
+		
+		pthread_t threads[NUM_THREADS];
+		int rc; //return code of thread
+		long t;
+
+		for(t=0;t<NUM_THREADS;t++){
+			printf("creaed child thread \n");
+			//Child thread created
+			rc=pthread_create(&threads[t],NULL,serve,(void *) t);
+			if(rc){
+				printf ("ERROR; return code from pthread_create() is %d\n",rc);
+				exit(-1);
+
+			}
+		}
+		 
+		 pthread_exit(NULL);
 		// Function for chatting between client and server
 		serve(connfd);
 	// }
