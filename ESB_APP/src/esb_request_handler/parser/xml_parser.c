@@ -31,6 +31,8 @@ typedef struct {
 }msg_data;
 
 
+
+
 //it will load xml document in xml document object
 
 xmlDocPtr load_xml_doc(char *xml_file_path) {
@@ -74,6 +76,13 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
 /*
 *validation : BMD should have some esssential fields
 * As of now these fields are: Sender, destination and messagetype and messageId  (Will change if needed)
+
+The validation will be done mainly for the envelope part of the BMD.
+
+    1.The mandatory values (Sender, Destination, Message Type, etc.) must be present in the received BMD.
+    2.For the received {Sender, Destination, Message Type}, there should be an active route record present in the routes table.
+    3.For the selected route record, there should be corresponding records present in transport_config and transform_config tables.
+    4.We will also check for some upper limit on the payload size. For example, the payload larger than 5MB may not be allowed, or are allowed only for certain senders and message types, etc.
 */
 bool is_bmd_valid (bmd* bmd_msg){
 
@@ -102,7 +111,40 @@ bool is_bmd_valid (bmd* bmd_msg){
 
     }
 
-    // printf("Validation Successful\n");
+   //  /*------part 2-----*/
+   //
+   //  //will use a funcion fun_fatch_from_route which will return use send, destination and message type ...
+   //  //these will be return us a route_data (data strucutre) amd we will compare values of them.
+   //  //
+   //  /*
+   //      typedef struct {
+   //          char *Sender;
+   //          char *Destination;
+   //          char *MessageType;
+   //      }route_data;
+   //  */
+   // if( (bmd_msg->Sender!= route_data->Sender) || (bmd_msg->Destination!= route_data->Destination) || (bmd_msg->MessageType!= route_data->MessageType)){
+   //      printf("Validation fails: There is no active route record present in routes table\n");
+   //      return false;
+   //  }
+   //
+   //  /*------part 3-----*/
+   //  //For the selected route record, there should be corresponding records present in transport_config and transform_config tables
+   //
+   //  //Function for looking up into transport and transform config tables   (if it return false then BMD is not valid)
+   //  if(!lookup_into_db(msg_data->Sender,msg_data->Destination,msg_data->Messagetype)){
+   //       printf("Validation fails: For the selected route record, there is no corresponding records present in transport_config and transform_config tables\n");
+   //      return false;
+   //  }
+
+    /*---- Part 4-----*/
+    //check for payload size, if its greater than 5 MB then its not valid.
+
+
+
+   /*---- If all 4 points are validated , than return true-----*/
+
+    printf("Validation Successful\n");
     return true;
 
 }
