@@ -7,6 +7,8 @@
 
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
+#include <stdbool.h>
+#include <string.h>
 #include "xml_parser.h"
 
 
@@ -14,7 +16,7 @@
 char *token = "63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
 
 //Structure for BMD Message data : Subject to change , As of now we are addding
-//important fields of BMD file which we want to use 
+//important fields of BMD file which we want to use
 typedef struct {
     char *MessageID;
     char *MessageType;
@@ -54,7 +56,7 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
     xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);  //save particular data in result object
     xmlXPathFreeContext(context);
 
-    //there is no path 
+    //there is no path
     if (result == NULL) {
         printf("ERROR: Failed to evaluate xpath expression.\n");
         return NULL;
@@ -70,37 +72,37 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
 
 
 /*
-*validation : BMD should have some esssential fields 
+*validation : BMD should have some esssential fields
 * As of now these fields are: Sender, destination and messagetype and messageId  (Will change if needed)
 */
 bool is_bmd_valid (bmd* bmd_msg){
-    
-   if(*bmd_msg.sender == 0){
-   
+
+   if(bmd_msg->Sender == 0){
+
        printf("Validation fails: sender is missing\n");
        return false;
-   
+
     }
-   if(*bmd_msg.destination == 0){
-   
+   if(bmd_msg->Destination == 0){
+
        printf("Validation fails:destination is missing\n");
        return false;
-   
+
     }
-    if(*bmd_msg.messageId == 0){
-        
+    if(bmd_msg->MessageID == 0){
+
         printf("Validation fails: messageId is missing\n");
         return false;
-    
+
     }
-   if(*bmd_msg.messageType == 0){
-    
+   if(bmd_msg->MessageType == 0){
+
        printf("Validation fails: messageType is missing\n");
        return false;
-   
+
     }
-   
-    printf("Validation Successful\n");
+
+    // printf("Validation Successful\n");
     return true;
 
 }
@@ -132,7 +134,7 @@ xmlChar* get_element_text(char *node_xpath, xmlDocPtr doc) {
 bmd * parse_xml(char * filepath) {
     xmlDocPtr doc = load_xml_doc(filepath);
     /*
-     used for testing purpose 
+     used for testing purpose
     */
     // printf("MessageID=%s\n", get_element_text("//MessageID", doc));
     // printf("Sender=%s\n", get_element_text("//Sender", doc));
@@ -160,12 +162,13 @@ bmd * parse_xml(char * filepath) {
     */
 
 
-    //Authentication  : As discussed in the common meeting, we're going to consider signature as a token for authentication 
+    //Authentication  : As discussed in the common meeting, we're going to consider signature as a token for authentication
     //so we will compare sinagture field of BMD with our token.
      if(((strcmp(get_element_text("//Signature", doc),token))==0)){
-    
-   		printf("Authentication is successful.\n");}
-       
+
+   		// printf("Authentication is successful.\n");
+    }
+
    	else{
    		printf("Authentication fails: Invalid BMD Request!!\n"); //if request is not valid we won't proceed with the flow
    		exit(1);
@@ -175,7 +178,7 @@ bmd * parse_xml(char * filepath) {
 
     //Validation
     if(is_bmd_valid(bmd_msg)){
-        //if valid insert the data in esb_request otherwise 
+        //if valid insert the data in esb_request otherwise
         //insert_data(bmd_msg); //sending data to insert this data into esb_request table
 
     }else{

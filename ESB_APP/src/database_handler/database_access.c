@@ -13,6 +13,11 @@ Description : This c program access the mysql database 'CAMEL_DB' and perform se
 
 #include "database_access.h"
 
+#define mysql_user_name "test_user"
+#define mysql_user_password "test_password"
+#define mysql_host "localhost"
+#define mysql_db_name "CAMEL_DB"
+
 // handle error based on mysql connection
 void handle_error(MYSQL *connection){
       fprintf(stderr, "%s\n", mysql_error(connection));
@@ -86,7 +91,7 @@ void update_single_field(MYSQL * conn, const char* const table_name, const char*
 }
 
 //select single field based on single condition given mysql connection and values
-char * select_single_field(MYSQL * conn,const char* const table_name,const char* const find,const char* const key,const char* const value){
+char * select_single_field_on_one_condition(MYSQL * conn,const char* const table_name,const char* const find,const char* const key,const char* const value){
       char buffer[1024];
       if(is_field_int(key)){
             char * query_str = "SELECT %s from %s where %s=%s";
@@ -112,8 +117,61 @@ char * select_single_field(MYSQL * conn,const char* const table_name,const char*
       return result_row[0]; //returning first row and first column value
 }
 
+//select is_active based on three condition given mysql connection and all string values only
+char * is_route_active(MYSQL * conn,const char* const sender,const char* const destination,const char* const message_type){
+      char buffer[1024];
+      char * query_str = "select route_id,is_active from routes where sender='%s' AND destination='%s' AND message_type='%s'";
+      sprintf(buffer,query_str,sender,destination,message_type);
+      printf("\n--> QUERY : %s\n\n",buffer);
+      if (mysql_query(conn, buffer)){
+        handle_error(conn);
+      }
+      MYSQL_RES *result_rows = mysql_store_result(conn);
+      MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      // printf("%s %s\n",result_row[0],result_row[1]);
+      if(result_row && strcmp(result_row[1],"1")==0){
+        return result_row[0];
+      }
+      return "Empty";
+}
+
+//select is_active based on three condition given mysql connection and all string values only
+bool is_route_present_in_transport_config(MYSQL * conn,const char* const route_id){
+      char buffer[1024];
+      char * query_str = "select id from transport_config where route_id=%s";
+      sprintf(buffer,query_str,route_id);
+      printf("\n--> QUERY : %s\n\n",buffer);
+      if (mysql_query(conn, buffer)){
+        handle_error(conn);
+      }
+      MYSQL_RES *result_rows = mysql_store_result(conn);
+      MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      if(!result_row){
+        return false;
+      }
+      return (result_row && strcmp(result_row[0],"1")==0)?true:false;
+}
+
+//select is_active based on three condition given mysql connection and all string values only
+bool is_route_present_in_transform_config(MYSQL * conn,const char* const route_id){
+      char buffer[1024];
+      char * query_str = "select id from transform_config where route_id=%s";
+      sprintf(buffer,query_str,route_id);
+      printf("\n--> QUERY : %s\n\n",buffer);
+      if (mysql_query(conn, buffer)){
+        handle_error(conn);
+      }
+      MYSQL_RES *result_rows = mysql_store_result(conn);
+      MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      if(!result_row){
+        return false;
+      }
+      return (result_row && strcmp(result_row[0],"1")==0)?true:false;
+}
+
 //insert ordered tuple in esb_request table given mysql connection and values
-void insert_one_in_esb_request(MYSQL * conn,const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10){
+void insert_one_in_esb_request(const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10){
+  MYSQL *conn = give_me_mysql_connection();
   char buffer[1024];
   char * query_str = "INSERT INTO esb_request"
                      "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,status_details) "
@@ -123,6 +181,23 @@ void insert_one_in_esb_request(MYSQL * conn,const char* const f2,const char* con
   if (mysql_query(conn, buffer)){
     handle_error(conn);
   }
+}
+
+MYSQL * give_me_mysql_connection(){
+  MYSQL *connection = mysql_init(NULL);
+
+  if (connection == NULL)
+  {
+      fprintf(stderr, "%s\n", mysql_error(connection));
+      exit(1);
+  }
+
+  if (mysql_real_connect(connection, mysql_host, mysql_user_name, mysql_user_password,
+          mysql_db_name, 0, NULL, 0) == NULL)
+  {
+        handle_error(connection);
+  }
+  return connection;
 }
 
 // //insert ordered tuple in routes table given mysql connection and values
@@ -175,32 +250,38 @@ int main(int argc, char **argv)
         handle_error(con);
   }
 
-  insert_one_in_esb_request(con,"1","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
-  insert_one_in_routes(con,"1","t","t","t","10");
-  insert_one_in_transport_config(con,"1","1","t","t");
-  insert_one_in_transform_config(con,"1","1","t","t");
+  // insert_one_in_esb_request(con,"1","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
+  // insert_one_in_routes(con,"1","t","t","t","10");
+  // insert_one_in_transport_config(con,"1","1","t","t");
+  // insert_one_in_transform_config(con,"1","1","t","t");
+  //
+  // insert_one_in_esb_request(con,"2","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
+  // insert_one_in_routes(con,"2","t","t","t","10");
+  // insert_one_in_transport_config(con,"2","2","t","t");
+  // insert_one_in_transform_config(con,"2","2","t","t");
+  //
+  // insert_one_in_esb_request(con,"3","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
+  // insert_one_in_routes(con,"3","t","t","t","10");
+  // insert_one_in_transport_config(con,"3","3","t","t");
+  // insert_one_in_transform_config(con,"3","3","t","t");
+  //
+  // printf("%s\n",select_single_field_on_one_condition(con,"routes","is_active","route_id","3"));
+  //
+  // char * table_name="routes";
+  // char * key="is_active";
+  // char * value="88";
+  // char * find="route_id";
+  // char * type="3";
+  // update_single_field(con,table_name,key,value,find,type);
+  //
+  // printf("%s\n",select_single_field_on_one_condition(con,"routes","is_active","route_id","3"));
+  // printf("%s\n",select_single_field_on_one_condition(con,"routes","is_active","route_id","35"));
 
-  insert_one_in_esb_request(con,"2","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
-  insert_one_in_routes(con,"2","t","t","t","10");
-  insert_one_in_transport_config(con,"2","2","t","t");
-  insert_one_in_transform_config(con,"2","2","t","t");
-
-  insert_one_in_esb_request(con,"3","t","t","t","t","t"," 9999-12-31 23:59:59","t","t","t");
-  insert_one_in_routes(con,"3","t","t","t","10");
-  insert_one_in_transport_config(con,"3","3","t","t");
-  insert_one_in_transform_config(con,"3","3","t","t");
-
-  printf("%s\n",select_single_field(con,"routes","is_active","route_id","3"));
-
-  char * table_name="routes";
-  char * key="is_active";
-  char * value="88";
-  char * find="route_id";
-  char * type="3";
-  update_single_field(con,table_name,key,value,find,type);
-
-  printf("%s\n",select_single_field(con,"routes","is_active","route_id","3"));
-  printf("%s\n",select_single_field(con,"routes","is_active","route_id","35"));
+  // printf("%s\n",is_route_active(con,"user_app_880","nationality_predictor_880","predict_nationality"));
+  char * route_id=is_route_active(con,"user_app_880","nationality_predictor_880","predict_nationality");
+  printf("%s\n",route_id);
+  printf("%d\n",is_route_present_in_transform_config(con,route_id));
+  printf("%d\n",is_route_present_in_transport_config(con,route_id));
 
   mysql_close(con);
   exit(0);
