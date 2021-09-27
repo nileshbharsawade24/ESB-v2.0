@@ -6,6 +6,7 @@ ESB Application of Camel group
     sudo apt install mysql-server
     sudo apt install libmysqlclient-dev
     sudo apt install libxml2-dev
+    sudo apt install libcurl4-openssl-dev
 
 <!-- Also make sure you have mysql installed in your system. <br /> -->
 
@@ -33,6 +34,9 @@ Then run the esb application with following commands :
     make clean
     make all
     ./run
+
+# References -
+[The libcurl C API](https://curl.se/libcurl/c/)
 
 # Contributors -
 [Deepak kumar](https://github.com/deepakjnv880)  
