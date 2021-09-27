@@ -10,6 +10,9 @@
 #include "xml_parser.h"
 
 
+//token for authentication
+char *token = "63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
+
 //Structure for BMD Message data : Subject to change , As of now we are addding
 //important fields of BMD file which we want to use 
 typedef struct {
@@ -65,6 +68,43 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
     return result;
 }
 
+
+/*
+*validation : BMD should have some esssential fields 
+* As of now these fields are: Sender, destination and messagetype and messageId  (Will change if needed)
+*/
+bool is_bmd_valid (bmd* bmd_msg){
+    
+   if(*bmd_msg.sender == 0){
+   
+       printf("Validation fails: sender is missing\n");
+       return false;
+   
+    }
+   if(*bmd_msg.destination == 0){
+   
+       printf("Validation fails:destination is missing\n");
+       return false;
+   
+    }
+    if(*bmd_msg.messageId == 0){
+        
+        printf("Validation fails: messageId is missing\n");
+        return false;
+    
+    }
+   if(*bmd_msg.messageType == 0){
+    
+       printf("Validation fails: messageType is missing\n");
+       return false;
+   
+    }
+   
+    printf("Validation Successful\n");
+    return true;
+
+}
+
 /**
  * Returns the text value of an XML element. It is expected that
  * there is only one XML element at the given xpath in the XML.
@@ -114,12 +154,40 @@ bmd * parse_xml(char * filepath) {
     bmd_msg->Payload= get_element_text("//Payload", doc);
 
 
-    //insert_data(bmd_msg); //sending data to insert this data into esb_request table
+
+    /*
+    * we will validate and authenticate  before inserting bmd into esb_able , if it fails we won't call insert into esb_request;
+    */
+
+
+    //Authentication  : As discussed in the common meeting, we're going to consider signature as a token for authentication 
+    //so we will compare sinagture field of BMD with our token.
+     if(((strcmp(get_element_text("//Signature", doc),token))==0)){
+    
+   		printf("Authentication is successful.\n");}
+       
+   	else{
+   		printf("Authentication fails: Invalid BMD Request!!\n"); //if request is not valid we won't proceed with the flow
+   		exit(1);
+    	}
+
+
+
+    //Validation
+    if(is_bmd_valid(bmd_msg)){
+        //if valid insert the data in esb_request otherwise 
+        //insert_data(bmd_msg); //sending data to insert this data into esb_request table
+
+    }else{
+        printf("Validation fails: Invalid BMD Request!!\n"); //if request is not valid we won't proceed with the flow
+   		exit(1);
+    }
 
     xmlFreeDoc(doc);
     xmlCleanupParser();
     return bmd_msg;
 }
+
 // int main(int argc, char const *argv[]) {
 //   bmd * b=parse_xml("../../BMD.xml");
 //   return 0;
