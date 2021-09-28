@@ -35,19 +35,32 @@ Note : Configure the port and database credential appropriately
 // #define mysql_db_name "CAMEL_DB"
 
 
-void perform_request_authentication_and_validation(int sockfd,char * buffer){
+bool perform_request_authentication_and_validation(int sockfd,char * buffer){
   if(!is_request_http_post(buffer)){
-    fprintf(stderr, "ERROR : client id %d request is not HTTP POST\n",sockfd);
+    char * reply=malloc(500*sizeof(char));
+    sprintf(reply,"Your request has been REJECTED because it is not HTTP POST request.\nTRY AGAIN with HTTP POST\n");
+    send(sockfd, reply, strlen(reply),0);
+    // printf("%s\n", );
+    // fprintf(stderr, "ERROR : client id %d request is not HTTP POST\n",sockfd);
     // close(sockfd);
-  	pthread_exit(NULL);
+  	// pthread_exit(NULL);
+    free(reply);
+    return false;
   }
   char* request_authentication_token=get_field_from_request(buffer,"authentication_token");
   //here is a crack with strcmp
   if(strncmp(ESB_AUTHENTICATION_TOKEN,request_authentication_token,strlen(ESB_AUTHENTICATION_TOKEN))!=0){
-    fprintf(stderr, "ERROR : client id %d have problem with AUTHENTICATION TOKEN\n",sockfd);
+    char * reply=malloc(500*sizeof(char));
+    sprintf(reply,"Your request has been REJECTED because of authentication_token.\nTRY AGAIN with correct authentication_token\n");
+    send(sockfd, reply, strlen(reply),0);
+    // printf("------------------->%ld\n",strlen(reply));
+    // fprintf(stderr, "ERROR : client id %d have problem with AUTHENTICATION TOKEN\n",sockfd);
     // close(sockfd);
-  	pthread_exit(NULL);
+  	// pthread_exit(NULL);
+    free(reply);
+    return false;
   }
+  return true;
 }
 
 void persist_BMD(char * buff){
@@ -66,6 +79,8 @@ void persist_BMD(char * buff){
   bmd * req=parse_xml(filename_xml);
   // inserting a tuple in esb_request table with given fields
   insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","-");
+  free(filename_http);
+  free(filename_xml);
 }
 
 //this will serve to a client given socket file descriptor 'sockfd'
@@ -83,15 +98,27 @@ void *serve(void* fd) {
   }
 	printf("\nClient id %d Request came.\n",sockfd);
   //incomming HTTP POST request authentication and validation
-  perform_request_authentication_and_validation(sockfd,buffer);
-  //persist BMD
-  persist_BMD(buffer);
-  //send acknowledege to client
-  char * reply=malloc(20*sizeof(char));
-  sprintf(reply,"Accepted\n");
-  write(sockfd, reply, sizeof(reply));
-	//close the client socket
+  if(perform_request_authentication_and_validation(sockfd,buffer)){
+    //persist BMD
+    persist_BMD(buffer);
+    //send acknowledege to client
+    char * reply=malloc(100*sizeof(char));
+    sprintf(reply,"Your request has been ACCEPTED.\nThanks for using our ESB SERVICE.:)\n");
+    send(sockfd, reply, strlen(reply),0);
+    free(reply);
+  }
+
+  // free(temp);
+  // int n=strlen(buffer);
+  // for(int i=0;i<n;i+=1024){
+  //   free(buffer);
+  //   buffer+=1024;
+  //   printf("i=%d=====\n",i);
+  // }
+  free(buffer);
+  //close the client socket
 	close(sockfd);
+  printf("Closed client with socket id %d...\n\n",sockfd);
 	pthread_exit(NULL);
 }
 
