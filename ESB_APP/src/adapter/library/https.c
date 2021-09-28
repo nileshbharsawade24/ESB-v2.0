@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <curl/curl.h>
+#include "../../database_handler/database_access.h"
+#include "../header/https.h"
 #define URL_MAX 100
 
-char* transform_for_nationality_predictor_880(const char* const base_url, const char* const key, const char* const value){
-  char* full_url=malloc(URL_MAX*sizeof(char));
-  sprintf(full_url,"%s/?%s=%s",base_url,key,value);
-  return full_url;
+void transform_for_nationality_predictor_880(bmd * msg){
+  msg->Payload=msg->Payload;//basically changed tranformed will override non transformed
+  return;
 }
 
-void transport_for_nationality_predictor_880(const char* const url){
+void transport_for_nationality_predictor_880(bmd * msg){
+  char * route_id= get_route_id_form_unique_tuple(msg->Sender,msg->Destination,msg->MessageType);
+  const char* const base_url=select_single_field_on_two_condition("transform_config","config_value","route_id",route_id,"config_key","api");
+  char* full_url=malloc(URL_MAX*sizeof(char));
+  sprintf(full_url,"%s/?name=%s",base_url,msg->Payload);
   CURL *curl;
   CURLcode response_code;
   //Global libcurl initialisation
@@ -18,7 +23,7 @@ void transport_for_nationality_predictor_880(const char* const url){
     curl = curl_easy_init();
     if(curl) {
       //setting curl in curl object
-      curl_easy_setopt(curl, CURLOPT_URL, url);
+      curl_easy_setopt(curl, CURLOPT_URL, full_url);
       printf("\nHTTPS GET Response ----------->\n");
       /* Perform the request, res will get the return code and error checking*/
       if((response_code=curl_easy_perform(curl)) != CURLE_OK){

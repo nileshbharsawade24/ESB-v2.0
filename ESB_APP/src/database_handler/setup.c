@@ -76,6 +76,7 @@ void setup(){
   			"received_on DATETIME NOT NULL,"
   			"data_location TEXT,"
   			"status VARCHAR(20) NOT NULL,"
+        "processing_attempts INT NOT NULL,"
   			"status_details TEXT"
   			 ")")){
         handle_error(con);
@@ -153,6 +154,27 @@ void setup(){
 
   if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
                        "(1,'method','http')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "INSERT INTO esb_request"
+                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "INSERT INTO esb_request"
+                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "INSERT INTO esb_request"
+                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
                        )){
         handle_error(con);
   }

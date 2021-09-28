@@ -5,6 +5,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "header/https.h"
 /**
  * These should come from the header file of the respective service
@@ -20,11 +21,18 @@
 typedef struct
 {
     const char *name;
-    void (*func)(char*);
+    void (*func)(bmd*);
 } function_map;
 
+const function_map load_corrosponding_transformation_function[] = {
+    {"nationality_predictor_880", transform_for_nationality_predictor_880}
+    // {"PO svc transport", transport_bmd_PO_svc},
+    // {"Credit service tranform", tranform_bmd_Credit_svc},
+    // {"Credit service transport", transport_bmd_Credit_svc}
+};
+
 const function_map load_corrosponding_transportation_function[] = {
-    {"HTTPS GET", https_get},
+    {"nationality_predictor_880", transport_for_nationality_predictor_880}
     // {"PO svc transport", transport_bmd_PO_svc},
     // {"Credit service tranform", tranform_bmd_Credit_svc},
     // {"Credit service transport", transport_bmd_Credit_svc}
@@ -33,7 +41,17 @@ const function_map load_corrosponding_transportation_function[] = {
 /* This is how the ESB may dynamically invoke the service adapter functions */
 void call_function(const char * mode,const char *name, void* data)
 {
-  if(strcmp("transport",mode)==0){
+  if(strcmp("transform",mode)==0){
+    for (int i = 0; i < (sizeof(load_corrosponding_transformation_function) / sizeof(load_corrosponding_transformation_function[0])); i++)
+    {
+        if (!strcmp(load_corrosponding_transformation_function[i].name, name) && load_corrosponding_transformation_function[i].func)
+        {
+            load_corrosponding_transformation_function[i].func(data);
+            return;
+        }
+    }
+  }
+  else if(strcmp("transport",mode)==0){
     for (int i = 0; i < (sizeof(load_corrosponding_transportation_function) / sizeof(load_corrosponding_transportation_function[0])); i++)
     {
         if (!strcmp(load_corrosponding_transportation_function[i].name, name) && load_corrosponding_transportation_function[i].func)
@@ -54,7 +72,19 @@ int main()
     // call_function("PO svc tranform", &d);
     // call_function("PO svc transport", &d);
     // call_function("Credit service tranform", &d);
-    char * url="https://api.nationalize.io/?name=Mahesh";
-    call_function("transport","HTTPS GET",url);
+    // char * url="https://api.nationalize.io/?name=Mahesh";
+    bmd * bmd_msg= malloc (sizeof (bmd)); //intializing bmd_msg object
+
+
+    //storing value in bmd_bsg object
+    bmd_msg->MessageID= "sd";
+    bmd_msg->MessageType = "sd";
+    bmd_msg->Sender= "sd";
+    bmd_msg->Destination= "sd";
+    bmd_msg->CreationDateTime= "sd";
+    bmd_msg->Signature= "sd";
+    bmd_msg->ReferenceID= "sd";
+    bmd_msg->Payload= "sd";
+    call_function("transport","nationality_predictor_880",bmd_msg);
 
 }

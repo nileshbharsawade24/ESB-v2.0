@@ -37,6 +37,7 @@ Then run the esb application with following commands :
 
 # References -
 [The libcurl C API](https://curl.se/libcurl/c/)
+[The MySQL C API](https://dev.mysql.com/doc/c-api/8.0/en/c-api-function-reference.html)
 
 # Contributors -
 [Deepak kumar](https://github.com/deepakjnv880)  

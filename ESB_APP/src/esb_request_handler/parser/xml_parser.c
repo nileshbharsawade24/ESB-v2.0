@@ -10,28 +10,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include "xml_parser.h"
-
+#include "../../database_handler/database_access.h"
 
 //token for authentication
 char *token = "63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
-
-//Structure for BMD Message data : Subject to change , As of now we are addding
-//important fields of BMD file which we want to use
-typedef struct {
-    char *MessageID;
-    char *MessageType;
-    char *Sender;
-    char *Destination;
-    char *CreationDateTime;
-    char *Signature;
-    char *ReferenceID;
-    char *Payload;
-
-
-}msg_data;
-
-
-
 
 //it will load xml document in xml document object
 
@@ -66,7 +48,7 @@ xmlXPathObjectPtr get_nodes_at_xpath(xmlDocPtr doc, xmlChar *xpath) {
 
     if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
         xmlXPathFreeObject(result);
-        printf("No matching nodes found at the xpath.\n");
+        // printf("No matching nodes found at the xpath.\n");
         return NULL;
     }
     return result;
@@ -84,67 +66,49 @@ The validation will be done mainly for the envelope part of the BMD.
     3.For the selected route record, there should be corresponding records present in transport_config and transform_config tables.
     4.We will also check for some upper limit on the payload size. For example, the payload larger than 5MB may not be allowed, or are allowed only for certain senders and message types, etc.
 */
-bool is_bmd_valid (bmd* bmd_msg){
+bool authenticate_and_validate_BMD (bmd* bmd_msg){
 
-   if(bmd_msg->Sender == 0){
-
-       printf("Validation fails: sender is missing\n");
+    //authentication
+    if(bmd_msg->Signature == NULL){
        return false;
-
     }
-   if(bmd_msg->Destination == 0){
 
-       printf("Validation fails:destination is missing\n");
+    //validation : part1
+    if(bmd_msg->Sender == NULL){
        return false;
-
     }
-    if(bmd_msg->MessageID == 0){
-
-        printf("Validation fails: messageId is missing\n");
+    if(bmd_msg->Destination == NULL){
+       return false;
+    }
+    if(bmd_msg->MessageID == NULL){
         return false;
-
     }
-   if(bmd_msg->MessageType == 0){
-
-       printf("Validation fails: messageType is missing\n");
+    if(bmd_msg->MessageType == NULL){
        return false;
-
     }
 
-   //  /*------part 2-----*/
-   //
-   //  //will use a funcion fun_fatch_from_route which will return use send, destination and message type ...
-   //  //these will be return us a route_data (data strucutre) amd we will compare values of them.
-   //  //
-   //  /*
-   //      typedef struct {
-   //          char *Sender;
-   //          char *Destination;
-   //          char *MessageType;
-   //      }route_data;
-   //  */
-   // if( (bmd_msg->Sender!= route_data->Sender) || (bmd_msg->Destination!= route_data->Destination) || (bmd_msg->MessageType!= route_data->MessageType)){
-   //      printf("Validation fails: There is no active route record present in routes table\n");
-   //      return false;
-   //  }
-   //
-   //  /*------part 3-----*/
-   //  //For the selected route record, there should be corresponding records present in transport_config and transform_config tables
-   //
-   //  //Function for looking up into transport and transform config tables   (if it return false then BMD is not valid)
-   //  if(!lookup_into_db(msg_data->Sender,msg_data->Destination,msg_data->Messagetype)){
-   //       printf("Validation fails: For the selected route record, there is no corresponding records present in transport_config and transform_config tables\n");
-   //      return false;
-   //  }
-
-    /*---- Part 4-----*/
+    //validation : part2
+    char * route_id=is_route_active(bmd_msg->Sender,bmd_msg->Destination,bmd_msg->MessageType);
+    if(route_id==NULL){
+      return false;
+    }
+    //validation : part3
+    if(!is_route_present_in_transform_config(route_id)){
+      return false;
+    }
+    if(!is_route_present_in_transport_config(route_id)){
+      return false;
+    }
+    //validation : part3
     //check for payload size, if its greater than 5 MB then its not valid.
-
-
-
+    float payload_size_in_MB=strlen(bmd_msg->Payload)/1000000.0;
+    // printf("----payload_size_in_MB------->%f\n",payload_size_in_MB);
+    if(payload_size_in_MB>5){
+      return false;
+    }
    /*---- If all 4 points are validated , than return true-----*/
 
-    printf("Validation Successful\n");
+    // printf("Validation Successful\n");
     return true;
 
 }
@@ -166,8 +130,10 @@ xmlChar* get_element_text(char *node_xpath, xmlDocPtr doc) {
             printf("ERROR: Expected one %s node, found %d\n", node_xpath, nodeset->nodeNr);
         }
         xmlXPathFreeObject(result);
-    } else {
-        printf("ERROR: Node not found at xpath %s\n", node_xpath);
+    }
+    else {
+        // printf("ERROR: Node not found at xpath %s\n", node_xpath);
+        return NULL;
     }
     return node_text;
 }
@@ -197,43 +163,12 @@ bmd * parse_xml(char * filepath) {
     bmd_msg->ReferenceID= get_element_text("//ReferenceID", doc);
     bmd_msg->Payload= get_element_text("//Payload", doc);
 
-
-
-    /*
-    * we will validate and authenticate  before inserting bmd into esb_able , if it fails we won't call insert into esb_request;
-    */
-
-
-    //Authentication  : As discussed in the common meeting, we're going to consider signature as a token for authentication
-    //so we will compare sinagture field of BMD with our token.
-     if(((strcmp(get_element_text("//Signature", doc),token))==0)){
-
-   		// printf("Authentication is successful.\n");
-    }
-
-   	else{
-   		printf("Authentication fails: Invalid BMD Request!!\n"); //if request is not valid we won't proceed with the flow
-   		exit(1);
-    	}
-
-
-
-    //Validation
-    if(is_bmd_valid(bmd_msg)){
-        //if valid insert the data in esb_request otherwise
-        //insert_data(bmd_msg); //sending data to insert this data into esb_request table
-
-    }else{
-        printf("Validation fails: Invalid BMD Request!!\n"); //if request is not valid we won't proceed with the flow
-   		exit(1);
-    }
-
     xmlFreeDoc(doc);
     xmlCleanupParser();
     return bmd_msg;
 }
 
 // int main(int argc, char const *argv[]) {
-//   bmd * b=parse_xml("../../BMD.xml");
+//   bmd * b=parse_xml("test.xml");
 //   return 0;
 // }

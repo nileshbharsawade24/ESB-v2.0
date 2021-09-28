@@ -78,7 +78,7 @@ void persist_BMD(char * buff){
   //parse xml
   bmd * req=parse_xml(filename_xml);
   // inserting a tuple in esb_request table with given fields
-  insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","-");
+  insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
   free(filename_http);
   free(filename_xml);
 }
