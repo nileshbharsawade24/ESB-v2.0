@@ -32,9 +32,10 @@ CREATE TABLE `esb_request` (
   `received_on` datetime NOT NULL,
   `data_location` text,
   `status` varchar(20) NOT NULL,
+  `processing_attempts` int NOT NULL,
   `status_details` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +44,6 @@ CREATE TABLE `esb_request` (
 
 LOCK TABLES `esb_request` WRITE;
 /*!40000 ALTER TABLE `esb_request` DISABLE KEYS */;
-INSERT INTO `esb_request` VALUES (1,'756E2EAA-1D5B-4BC0-ACC4-4CEB669408DA','6393F82F-4687-433D-AA23-1966330381FE','CreditReport','INV-PROFILE-889712','A9ECAEF2-107A-4452-9553-043B6D25386E','2021-09-23 17:56:32','./tmp/BMD_1632399989.xml','Available','-');
 /*!40000 ALTER TABLE `esb_request` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -142,4 +142,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-23 20:03:08
+-- Dump completed on 2021-09-29 13:37:01

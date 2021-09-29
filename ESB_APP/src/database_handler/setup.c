@@ -38,10 +38,13 @@ void setup(){
       handle_error(con);
   }
 
-  if (mysql_query(con, "create database IF NOT EXISTS CAMEL_DB"))
+  if (mysql_query(con, "create database CAMEL_DB"))
   {
-        handle_error(con);
+    fprintf(stderr, "'CAMEL_DB' database already exists.\n"
+    "Either make sure it rightly setup or just delete this database completely and run setup again.\n");
+    return;
   }
+
 
   con=mysql_init(NULL);
   if (mysql_real_connect(con, mysql_host, mysql_user_name, mysql_user_password,
@@ -50,7 +53,7 @@ void setup(){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE TABLE IF NOT EXISTS routes ("
+  if (mysql_query(con, "CREATE TABLE routes ("
   			"route_id INT AUTO_INCREMENT,"
   			"sender VARCHAR(45),"
   			"destination VARCHAR(45),"
@@ -66,7 +69,7 @@ void setup(){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE TABLE IF NOT EXISTS esb_request ("
+  if (mysql_query(con, "CREATE TABLE esb_request ("
   			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"sender_id VARCHAR(45) NOT NULL,"
   			"dest_id VARCHAR(45) NOT NULL,"
@@ -86,7 +89,7 @@ void setup(){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transform_config ("
+  if (mysql_query(con, "CREATE TABLE transform_config ("
   			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"route_id INT NOT NULL,"
   			"config_key VARCHAR(45) NOT NULL,"
@@ -107,7 +110,7 @@ void setup(){
         handle_error(con);
   }
 
-  if (mysql_query(con, "CREATE TABLE IF NOT EXISTS transport_config ("
+  if (mysql_query(con, "CREATE TABLE transport_config ("
   			"id INT PRIMARY KEY AUTO_INCREMENT ,"
   			"route_id INT,"
   			"config_key VARCHAR(45),"

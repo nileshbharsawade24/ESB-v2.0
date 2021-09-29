@@ -17,32 +17,28 @@ Description : WORKER
 #define NUM_WORKERS 5
 #define threshold_for_processing_attempts 5
 
-void cleanup(char * status,bmd* req,task* mytask){
-  MYSQL* connection=give_me_mysql_connection();
+void cleanup(bmd* req,task* mytask){
   remove(mytask->fpath);
-  // update_single_field(connection, "esb_request","status",status,"id", mytask->id);
   free(req);
   free(mytask);
+  pthread_exit(NULL);
 }
 
 void *work(void * t){
   task * mytask = (task*)t;
-  // printf("---->%s\n",mytask->fpath);
-  //parse xml
-  // char * actual_file_path=malloc(30*sizeof(char));
-  // sprintf(actual_file_path,"%s",mytask->fpath);
   bmd * req=parse_xml(mytask->fpath);
+  MYSQL* connection=give_me_mysql_connection();
+  char id[10];
+  sprintf(id,"%d",mytask->id);
   if(!authenticate_and_validate_BMD(req)){
-    // free(actual_file_path);
-    free(mytask);
-    pthread_exit(NULL);
+    update_single_field(connection, "esb_request","status","failed","id",id);
+    cleanup(req,mytask);
   }
-  //here
+
   call_function("transform",req->Destination, req);
   call_function("transport",req->Destination, req);
-  // free(actual_file_path);
-  // free(mytask);
-  // cleanup(char * status,bmd* req,task* mytask);
+  update_single_field(connection, "esb_request","status","done","id",id);
+  cleanup(req,mytask);
 }
 
 void esb_request_poller(){
@@ -59,17 +55,21 @@ void esb_request_poller(){
       if (polled_task->processing_attempts<threshold_for_processing_attempts) {
         update_single_field(connection, "esb_request","status","taken","id", id);
         update_single_field(connection, "esb_request","processing_attempts",val,"id", id);
+        //----handover task to thread----
+   		  if(pthread_create(&threads[count%NUM_WORKERS],NULL,&work,(void*)polled_task)!=0){
+   			  printf ("ERROR: child thread not created\n");
+   			  exit(-1);
+   		  }
+        else{
+          count++;
+        }
       }
       else{
         update_single_field(connection, "esb_request","status","failed","id", id);
         //do cleanup
+        remove(polled_task->fpath);
+        free(polled_task);
       }
-      //----create child thread----
- 		 if(pthread_create(&threads[count%NUM_WORKERS],NULL,&work,(void*)polled_task)!=0){
- 			 printf ("ERROR: child thread not created\n");
- 			 exit(-1);
- 		 }
-      count++;
     }
     sleep(5);
   }

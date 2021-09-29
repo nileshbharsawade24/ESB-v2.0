@@ -15,9 +15,8 @@ Note : Configure the port and database credential appropriately
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdbool.h>
-// #include <mysql.h>
 #include <time.h>
-#include<pthread.h>
+#include <pthread.h>
 
 #include "parser/http_parser.h"
 #include "parser/xml_parser.h"
@@ -29,10 +28,6 @@ Note : Configure the port and database credential appropriately
 #define PATH_MAX 50
 #define NUM_THREADS 5
 #define SA struct sockaddr
-// #define mysql_user_name "test_user"
-// #define mysql_user_password "test_password"
-// #define mysql_host "localhost"
-// #define mysql_db_name "CAMEL_DB"
 
 
 bool perform_request_authentication_and_validation(int sockfd,char * buffer){
@@ -109,13 +104,6 @@ void *serve(void* fd) {
     free(reply);
   }
 
-  // free(temp);
-  // int n=strlen(buffer);
-  // for(int i=0;i<n;i+=1024){
-  //   free(buffer);
-  //   buffer+=1024;
-  //   printf("i=%d=====\n",i);
-  // }
   free(buffer);
   //close the client socket
 	close(sockfd);
@@ -159,8 +147,9 @@ void handle_request()
 		printf("Server Listen failed...\n");
 		exit(0);
 	}
-	else
-		printf("Server listening..\n");
+	else{
+		printf("Server listening on PORT NO %d ...\n",PORT);
+  }
 	len = sizeof(cli);
 
 	//defining thread

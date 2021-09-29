@@ -21,19 +21,54 @@ Also make sure in your mysql server, there is a user with  name *test_user*, pas
     ```
     GRANT ALL ON CAMEL_DB.* TO 'test_user';
     ```
-    
+
 # Layout overview
-.</br>
-├── ESB_APP</br>
-│   ├── src</br>
-│   │   ├── adapter</br>
-│   │   ├── database_handler</br>
-│   │   ├── esb_request_handler</br>
-│   │   ├── worker</br>
-│   │   ├── tmp</br>
-│   │   └── server.c</br>
-│   │   └── makefile</br>
-│   ├── test</br>
+```
+username@system_name:~/WFH/Camel$ tree
+.  
+├── Daily_Work_Report.md  
+├── ESB_APP  
+│   ├── conf  
+│   │   ├── build.conf  
+│   │   └── esb_app.conf  
+│   ├── src  
+│   │   ├── adapter  
+│   │   │   ├── function_lookup_and_invocation.c  
+│   │   │   ├── function_lookup_and_invocation.h  
+│   │   │   ├── header  
+│   │   │   │   ├── email.h  
+│   │   │   │   └── https.h  
+│   │   │   └── library  
+│   │   │       ├── email.c  
+│   │   │       └── https.c  
+│   │   ├── database_handler  
+│   │   │   ├── database_access.c  
+│   │   │   ├── database_access.h  
+│   │   │   └── setup.c  
+│   │   ├── esb_request_handler  
+│   │   │   ├── esb.h  
+│   │   │   ├── parser  
+│   │   │   │   ├── http_parser.c  
+│   │   │   │   ├── http_parser.h  
+│   │   │   │   ├── xml_parser.c  
+│   │   │   │   └── xml_parser.h  
+│   │   │   ├── request_handler.c  
+│   │   │   └── request_handler.h  
+│   │   ├── makefile  
+│   │   ├── server.c  
+│   │   ├── tmp  
+│   │   └── worker  
+│   │       ├── worker.c  
+│   │       └── worker.h  
+│   └── test  
+│       ├── munit.c  
+│       └── munit.h  
+├── Modules.pdf  
+├── mysql_dump.sql  
+├── README.md  
+├── Single_flow.png  
+└── Test Scenerio Example.pdf  
+```
 
 # How to run
 First go to ESB_APP/src.</br>
