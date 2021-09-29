@@ -25,7 +25,7 @@ Note : Configure the port and database credential appropriately
 
 #define ESB_AUTHENTICATION_TOKEN "nho2021"
 #define MAX 10240
-#define PORT 8889
+#define PORT 8888
 #define PATH_MAX 50
 #define NUM_THREADS 5
 #define SA struct sockaddr
