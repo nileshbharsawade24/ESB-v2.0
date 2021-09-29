@@ -12,7 +12,7 @@ void transform_for_nationality_predictor_880(bmd * msg){
 
 void transport_for_nationality_predictor_880(bmd * msg){
   char * route_id= get_route_id_form_unique_tuple(msg->Sender,msg->Destination,msg->MessageType);
-  const char* const base_url=select_single_field_on_two_condition("transform_config","config_value","route_id",route_id,"config_key","api");
+  const char* const base_url=select_single_field_on_two_condition("transport_config","config_value","route_id",route_id,"config_key","api");
   char* full_url=malloc(URL_MAX*sizeof(char));
   sprintf(full_url,"%s/?name=%s",base_url,msg->Payload);
   CURL *curl;
@@ -24,7 +24,7 @@ void transport_for_nationality_predictor_880(bmd * msg){
     if(curl) {
       //setting curl in curl object
       curl_easy_setopt(curl, CURLOPT_URL, full_url);
-      printf("\nHTTPS GET Response ----------->\n");
+      printf("\nHTTPS GET Response on `%s` ----------->\n",full_url);
       /* Perform the request, res will get the return code and error checking*/
       if((response_code=curl_easy_perform(curl)) != CURLE_OK){
         fprintf(stderr, "ERROR : curl_easy_perform() failed: %s",curl_easy_strerror(response_code));

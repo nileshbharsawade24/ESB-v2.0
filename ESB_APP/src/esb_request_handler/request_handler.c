@@ -25,7 +25,7 @@ Note : Configure the port and database credential appropriately
 
 #define ESB_AUTHENTICATION_TOKEN "nho2021"
 #define MAX 10240
-#define PORT 8888
+#define PORT 8889
 #define PATH_MAX 50
 #define NUM_THREADS 5
 #define SA struct sockaddr
@@ -79,6 +79,7 @@ void persist_BMD(char * buff){
   bmd * req=parse_xml(filename_xml);
   // inserting a tuple in esb_request table with given fields
   insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
+  remove(filename_http);
   free(filename_http);
   free(filename_xml);
 }
@@ -123,7 +124,7 @@ void *serve(void* fd) {
 }
 
 // Driver function
-int main()
+void handle_request()
 {
 
 	int sockfd, connfd, len;
@@ -194,3 +195,8 @@ int main()
 	/*this is the last thing main() should do */
 	pthread_exit(NULL);
 }
+
+// int main(int argc, char const *argv[]) {
+//   handle_request();
+//   return 0;
+// }

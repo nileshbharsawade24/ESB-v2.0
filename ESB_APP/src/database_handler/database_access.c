@@ -103,7 +103,7 @@ void update_single_field(MYSQL * conn, const char* const table_name, const char*
 
   mysql_stmt_bind_param(stmt, bind);
 
-  printf("\n--> QUERY : %s\n\n",buffer);
+  //printf("\n--> QUERY : %s\n\n",buffer);
   if(mysql_stmt_execute(stmt)!=0){
     handle_error(conn);
   }
@@ -126,7 +126,7 @@ char * select_single_field_on_two_condition(const char* const table_name,const c
 
       mysql_stmt_bind_param(stmt, bind);
 
-      printf("\n--> QUERY : %s\n\n",buffer);
+      //printf("\n--> QUERY : %s\n\n",buffer);
 
       if(mysql_stmt_execute(stmt)!=0){
         handle_error(conn);
@@ -201,9 +201,9 @@ char * select_single_field_on_two_condition(const char* const table_name,const c
 char * get_route_id_form_unique_tuple(const char* const sender,const char* const destination,const char* const message_type){
       MYSQL * conn = give_me_mysql_connection();
       char buffer[1024];
-      char * query_str = "select route_id where sender='%s' AND destination='%s' AND message_type='%s'";
+      char * query_str = "select route_id from routes where sender='%s' AND destination='%s' AND message_type='%s'";
       sprintf(buffer,query_str,sender,destination,message_type);
-      printf("\n--> QUERY : %s\n\n",buffer);
+      //printf("\n--> QUERY : %s\n\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
@@ -222,7 +222,7 @@ char * is_route_active(const char* const sender,const char* const destination,co
       char buffer[1024];
       char * query_str = "select route_id,is_active from routes where sender='%s' AND destination='%s' AND message_type='%s'";
       sprintf(buffer,query_str,sender,destination,message_type);
-      printf("\n--> QUERY : %s\n\n",buffer);
+      //printf("\n--> QUERY : %s\n\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
@@ -241,7 +241,7 @@ bool is_route_present_in_transport_config(const char* const route_id){
       char buffer[1024];
       char * query_str = "select id from transport_config where route_id=%s";
       sprintf(buffer,query_str,route_id);
-      printf("\n--> QUERY : %s\n\n",buffer);
+      //printf("\n--> QUERY : %s\n\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
@@ -259,7 +259,7 @@ bool is_route_present_in_transform_config(const char* const route_id){
       char buffer[1024];
       char * query_str = "select id from transform_config where route_id=%s";
       sprintf(buffer,query_str,route_id);
-      printf("\n--> QUERY : %s\n\n",buffer);
+      //printf("\n--> QUERY : %s\n\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
@@ -279,7 +279,7 @@ void insert_one_in_esb_request(const char* const f2,const char* const f3,const c
                      "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
                      "VALUES (\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%s,\"%s\",\"%s\",%s,\"%s\")";
   sprintf(buffer, query_str,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11);
-  printf("\n--> QUERY : %s\n\n",buffer);
+  //printf("\n--> QUERY : %s\n\n",buffer);
   if (mysql_query(conn, buffer)){
     handle_error(conn);
   }
@@ -307,7 +307,7 @@ MYSQL * give_me_mysql_connection(){
 //   char buffer[1024];
 //   char * query_str = "INSERT INTO routes VALUES (%d,\"%s\",\"%s\",\"%s\",%d)";
 //   sprintf(buffer, query_str,atoi(f1),f2,f3,f4,atoi(f5));
-//   printf("\n--> QUERY : %s\n\n",buffer);
+//   //printf("\n--> QUERY : %s\n\n",buffer);
 //   if (mysql_query(conn, buffer)){
 //     handle_error(conn);
 //   }
@@ -318,7 +318,7 @@ MYSQL * give_me_mysql_connection(){
 //   char buffer[1024];
 //   char * query_str = "INSERT INTO transport_config VALUES (%d,%d,\"%s\",\"%s\")";
 //   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
-//   printf("\n--> QUERY : %s\n\n",buffer);
+//   //printf("\n--> QUERY : %s\n\n",buffer);
 //   if (mysql_query(conn, buffer)){
 //     handle_error(conn);
 //   }
@@ -329,7 +329,7 @@ MYSQL * give_me_mysql_connection(){
 //   char buffer[1024];
 //   char * query_str = "INSERT INTO transform_config VALUES (%d,%d,\"%s\",\"%s\")";
 //   sprintf(buffer, query_str,atoi(f1),atoi(f2),f3,f4);
-//   printf("\n--> QUERY : %s\n\n",buffer);
+//   //printf("\n--> QUERY : %s\n\n",buffer);
 //   if (mysql_query(conn, buffer)){
 //     handle_error(conn);
 //   }

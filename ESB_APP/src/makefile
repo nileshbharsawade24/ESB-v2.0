@@ -5,21 +5,33 @@ Employer : Broadridge\
 Description : This is makefile with two main target `all` and `setup` with `clean`.\
 #\
 
-all: server.o http_parser.o database_access.o xml_parser.o
-	gcc -o run xml_parser.o http_parser.o server.o database_access.o -lxml2 `mysql_config --libs`
+headers=-I/usr/include/mysql/ -I/usr/include/libxml2/
+libraries=-lxml2 -lcurl `mysql_config --libs`
+OBJ= server.o request_handler.o worker.o https.o function_lookup_and_invocation.o http_parser.o database_access.o xml_parser.o
+
+all:$(OBJ)
+	gcc -o server $(OBJ) $(libraries)
 	rm *.o
 	mkdir -p tmp
-server.o: esb_request_handler/server.c
-	gcc -c esb_request_handler/server.c -I/usr/include/mysql/
+server.o: server.c
+	gcc -c server.c
+worker.o: worker/worker.c
+	gcc -c $(headers) worker/worker.c
+request_handler.o: esb_request_handler/request_handler.c
+	gcc -c $(headers) esb_request_handler/request_handler.c
+https.o: adapter/library/https.c
+	gcc -c $(headers) adapter/library/https.c
+function_lookup_and_invocation.o: adapter/function_lookup_and_invocation.c
+	gcc -c adapter/function_lookup_and_invocation.c
 http_parser.o: esb_request_handler/parser/http_parser.c
 	gcc -c esb_request_handler/parser/http_parser.c
 xml_parser.o: esb_request_handler/parser/xml_parser.c
-	gcc -c -I/usr/include/libxml2/ esb_request_handler/parser/xml_parser.c
+	gcc -c $(headers) esb_request_handler/parser/xml_parser.c
 database_access.o: database_handler/database_access.c
-	gcc -c -I/usr/include/mysql/ database_handler/database_access.c
+	gcc -c $(headers) database_handler/database_access.c
 
 setup: database_handler/setup.c
-	gcc -I/usr/include/mysql/ -o setup database_handler/setup.c `mysql_config --libs`
+	gcc $(headers) -o setup database_handler/setup.c $(libraries)
 
 clean:
-	rm setup run *.o
+	rm setup server *.o

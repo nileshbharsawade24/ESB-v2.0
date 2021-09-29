@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "header/https.h"
+#include "function_lookup_and_invocation.h"
 /**
  * These should come from the header file of the respective service
  * provider's implementation of the transformation and transport.
@@ -66,25 +67,25 @@ void call_function(const char * mode,const char *name, void* data)
   }
 }
 
-int main()
-{
-    // int d = 998;
-    // call_function("PO svc tranform", &d);
-    // call_function("PO svc transport", &d);
-    // call_function("Credit service tranform", &d);
-    // char * url="https://api.nationalize.io/?name=Mahesh";
-    bmd * bmd_msg= malloc (sizeof (bmd)); //intializing bmd_msg object
-
-
-    //storing value in bmd_bsg object
-    bmd_msg->MessageID= "sd";
-    bmd_msg->MessageType = "sd";
-    bmd_msg->Sender= "sd";
-    bmd_msg->Destination= "sd";
-    bmd_msg->CreationDateTime= "sd";
-    bmd_msg->Signature= "sd";
-    bmd_msg->ReferenceID= "sd";
-    bmd_msg->Payload= "sd";
-    call_function("transport","nationality_predictor_880",bmd_msg);
-
-}
+// int main()
+// {
+//     // int d = 998;
+//     // call_function("PO svc tranform", &d);
+//     // call_function("PO svc transport", &d);
+//     // call_function("Credit service tranform", &d);
+//     // char * url="https://api.nationalize.io/?name=Mahesh";
+//     bmd * bmd_msg= malloc (sizeof (bmd)); //intializing bmd_msg object
+//
+//
+//     //storing value in bmd_bsg object
+//     bmd_msg->MessageID= "sd";
+//     bmd_msg->MessageType = "sd";
+//     bmd_msg->Sender= "sd";
+//     bmd_msg->Destination= "sd";
+//     bmd_msg->CreationDateTime= "sd";
+//     bmd_msg->Signature= "sd";
+//     bmd_msg->ReferenceID= "sd";
+//     bmd_msg->Payload= "sd";
+//     call_function("transport","nationality_predictor_880",bmd_msg);
+//
+// }

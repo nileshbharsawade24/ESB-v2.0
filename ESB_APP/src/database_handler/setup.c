@@ -158,26 +158,26 @@ void setup(){
         handle_error(con);
   }
 
-  if (mysql_query(con, "INSERT INTO esb_request"
-                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
-                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
-                       )){
-        handle_error(con);
-  }
-
-  if (mysql_query(con, "INSERT INTO esb_request"
-                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
-                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
-                       )){
-        handle_error(con);
-  }
-
-  if (mysql_query(con, "INSERT INTO esb_request"
-                     "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
-                     "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
-                       )){
-        handle_error(con);
-  }
+  // if (mysql_query(con, "INSERT INTO esb_request"
+  //                    "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+  //                    "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
+  //                      )){
+  //       handle_error(con);
+  // }
+  //
+  // if (mysql_query(con, "INSERT INTO esb_request"
+  //                    "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+  //                    "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
+  //                      )){
+  //       handle_error(con);
+  // }
+  //
+  // if (mysql_query(con, "INSERT INTO esb_request"
+  //                    "(sender_id,dest_id,message_type,reference_id,message_id,received_on,data_location,status,processing_attempts,status_details) "
+  //                    "VALUES ('t','t','t','t','t',now(),'t','t',0,'t')"
+  //                      )){
+  //       handle_error(con);
+  // }
 
   mysql_close(con);
 }
