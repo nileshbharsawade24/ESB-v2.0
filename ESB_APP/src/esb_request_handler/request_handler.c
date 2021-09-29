@@ -24,7 +24,7 @@ Note : Configure the port and database credential appropriately
 
 #define ESB_AUTHENTICATION_TOKEN "nho2021"
 #define MAX 10240
-#define PORT 8889
+#define PORT 8888
 #define PATH_MAX 50
 #define NUM_THREADS 5
 #define SA struct sockaddr
@@ -159,9 +159,9 @@ void handle_request()
 
   unsigned int count=0;
 
-	//keep listening for new clients
+	// keep listening for new clients
 	while(1){
-		 // Accept the data packet from client and verification
+		 // Accept the client socket connection
 		 connfd = accept(sockfd, (SA*)&cli, &len);
 		 if (connfd < 0) {
 			 printf("server acccept failed...\n");
@@ -170,7 +170,7 @@ void handle_request()
 		 else
 			 printf("server acccept the client with id %d ...\n",connfd);
 
-		 //----create child thread----
+		 // assign different client to different thread
 		 if(pthread_create(&threads[count%NUM_THREADS],NULL,&serve,&connfd)!=0){
 			 printf ("ERROR: child thread not created\n");
 			 exit(-1);
@@ -181,10 +181,14 @@ void handle_request()
 	// close the server socket
 	close(sockfd);
 
-	/*this is the last thing main() should do */
-	pthread_exit(NULL);
+	// waiting to terminate all NUM_THREADS thread
+  for(int i=0;i<NUM_THREADS;i++){
+    pthread_join(threads[i], NULL);
+  }
+
 }
 
+/* for testing purpose  only */
 // int main(int argc, char const *argv[]) {
 //   handle_request();
 //   return 0;

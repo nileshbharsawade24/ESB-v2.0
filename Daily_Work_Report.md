@@ -14,3 +14,4 @@
 | 24 Sep 2021  | Reading about different transporation methods             | Transporataion and transformation of HTTP   |
 | 27 Sep 2021  | BMD message authentication and validation             | Request authentication and validation, modification in database access c code    |
 | 28 Sep 2021  | Single flow for http             | Single flow for http    |
+| 29 Sep 2021  | Added email functionality             | Single flow for http and code commenting   |

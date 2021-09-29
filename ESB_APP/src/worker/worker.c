@@ -2,7 +2,7 @@
 Author : Deepak kumar
 Designation : Senior Member Technical
 Employer : Broadridge
-Description : WORKER
+Description : This program will poll the database and assign task to different threads
 */
 #include <stdio.h>
 #include <pthread.h>
@@ -55,7 +55,7 @@ void esb_request_poller(){
       if (polled_task->processing_attempts<threshold_for_processing_attempts) {
         update_single_field(connection, "esb_request","status","taken","id", id);
         update_single_field(connection, "esb_request","processing_attempts",val,"id", id);
-        //----handover task to thread----
+        //handover task to thread
    		  if(pthread_create(&threads[count%NUM_WORKERS],NULL,&work,(void*)polled_task)!=0){
    			  printf ("ERROR: child thread not created\n");
    			  exit(-1);
@@ -73,8 +73,13 @@ void esb_request_poller(){
     }
     sleep(5);
   }
+  // waiting to terminate all NUM_THREADS thread
+  for(int i=0;i<NUM_WORKERS;i++){
+    pthread_join(threads[i], NULL);
+  }
 }
 
+/* for testing purpose only */
 // int main(int argc, char const *argv[]) {
 //   esb_request_poller();
 //   return 0;
