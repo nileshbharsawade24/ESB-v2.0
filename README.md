@@ -9,7 +9,7 @@ ESB Application of Camel group
     sudo apt install libcurl4-openssl-dev
 
 Also make sure in your mysql server, there is a user with  name *test_user*, password *test_password* and have all access grant on *CAMEL_DB* database. One can do this with following steps:<br />
-1. Open mysql promt from root
+1. Open mysql promt with sudo privilege
     ```
     sudo mysql
     ```
@@ -29,11 +29,11 @@ Also make sure in your mysql server, there is a user with  name *test_user*, pas
 │   │   ├── adapter</br>
 │   │   ├── database_handler</br>
 │   │   ├── esb_request_handler</br>
-│   │   └── worker</br>
-│   │   └── tmp</br>
+│   │   ├── worker</br>
+│   │   ├── tmp</br>
 │   │   └── server.c</br>
-│   │   ├── makefile</br>
-│   └── test</br>
+│   │   └── makefile</br>
+│   ├── test</br>
 
 # How to run
 First go to ESB_APP/src.</br>
