@@ -13,3 +13,4 @@
 | 23 Sep 2021  | Client thread creation and manual table filling             | Database access files modification and manual table filling   |
 | 24 Sep 2021  | Reading about different transporation methods             | Transporataion and transformation of HTTP   |
 | 27 Sep 2021  | BMD message authentication and validation             | Request authentication and validation, modification in database access c code    |
+| 28 Sep 2021  | Single flow for http             | Single flow for http    |
