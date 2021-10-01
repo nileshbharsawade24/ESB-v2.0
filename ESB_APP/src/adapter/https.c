@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <curl/curl.h>
-#include "../../database_handler/database_access.h"
-#include "../header/https.h"
+#include "../database_handler/database_access.h"
+#include "./https.h"
 #define URL_MAX 100
 
 void transform_for_nationality_predictor_880(bmd * msg){

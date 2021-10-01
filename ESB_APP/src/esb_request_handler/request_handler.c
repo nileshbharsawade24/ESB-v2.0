@@ -58,7 +58,7 @@ bool perform_request_authentication_and_validation(int sockfd,char * buffer){
   return true;
 }
 
-void persist_BMD(char * buff){
+char * persist_BMD(char * buff){
   unsigned long tm=(unsigned long)time(NULL);
 	char *filename_http = malloc(PATH_MAX * sizeof(char));
 	char *filename_xml = malloc(PATH_MAX * sizeof(char));
@@ -73,10 +73,11 @@ void persist_BMD(char * buff){
   //parse xml
   bmd * req=parse_xml(filename_xml);
   // inserting a tuple in esb_request table with given fields
-  insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
+  char * req_id=insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
   remove(filename_http);
   free(filename_http);
   free(filename_xml);
+  return req_id;
 }
 
 //this will serve to a client given socket file descriptor 'sockfd'
@@ -96,10 +97,10 @@ void *serve(void* fd) {
   //incomming HTTP POST request authentication and validation
   if(perform_request_authentication_and_validation(sockfd,buffer)){
     //persist BMD
-    persist_BMD(buffer);
+    char * correlation_id=persist_BMD(buffer);
     //send acknowledege to client
     char * reply=malloc(100*sizeof(char));
-    sprintf(reply,"Your request has been ACCEPTED.\nThanks for using our ESB SERVICE.:)\n");
+    sprintf(reply,"Your request has been SUBMITTED.\n\"%s\" is your correlation id to check the status later.'\nThanks for using our ESB SERVICE.:)\n",correlation_id);
     send(sockfd, reply, strlen(reply),0);
     free(reply);
   }

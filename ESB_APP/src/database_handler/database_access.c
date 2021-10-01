@@ -3,6 +3,7 @@ Author : Deepak kumar
 Designation : Senior Member Technical
 Employer : Broadridge
 Description : This c program access the mysql database 'CAMEL_DB' and perform selection,insertion and updation
+Helpful links : https://stackoverflow.com/questions/14827783/auto-increment-and-last-insert-id
 */
 
 #include <mysql.h>
@@ -272,7 +273,7 @@ bool is_route_present_in_transform_config(const char* const route_id){
 }
 
 //insert ordered tuple in esb_request table given mysql connection and values
-void insert_one_in_esb_request(const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10,const char* const f11){
+char* insert_one_in_esb_request(const char* const f2,const char* const f3,const char* const f4,const char* const f5,const char* const f6,const char* const f7,const char* const f8,const char* const f9,const char* const f10,const char* const f11){
   MYSQL *conn = give_me_mysql_connection();
   char buffer[1024];
   char * query_str = "INSERT INTO esb_request"
@@ -283,6 +284,16 @@ void insert_one_in_esb_request(const char* const f2,const char* const f3,const c
   if (mysql_query(conn, buffer)){
     handle_error(conn);
   }
+  if (mysql_query(conn, "SELECT LAST_INSERT_ID()")){
+    handle_error(conn);
+  }
+  MYSQL_RES *result_rows = mysql_store_result(conn);
+  MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+  // printf("%s %s\n",result_row[0],result_row[1]);
+  if(result_row){
+    return result_row[0];
+  }
+  return NULL;
 }
 
 MYSQL * give_me_mysql_connection(){

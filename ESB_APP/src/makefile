@@ -19,8 +19,8 @@ worker.o: worker/worker.c
 	gcc -c $(headers) worker/worker.c
 request_handler.o: esb_request_handler/request_handler.c
 	gcc -c $(headers) esb_request_handler/request_handler.c
-https.o: adapter/library/https.c
-	gcc -c $(headers) adapter/library/https.c
+https.o: adapter/https.c
+	gcc -c $(headers) adapter/https.c
 function_lookup_and_invocation.o: adapter/function_lookup_and_invocation.c
 	gcc -c adapter/function_lookup_and_invocation.c
 http_parser.o: esb_request_handler/parser/http_parser.c

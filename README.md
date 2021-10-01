@@ -22,9 +22,9 @@ Also make sure in your mysql server, there is a user with  name *test_user*, pas
     GRANT ALL ON CAMEL_DB.* TO 'test_user';
     ```
 
-# Layout overview
+# Project Layout
 ```
-username@system_name:~/WFH/Camel$ tree
+username@system_name:~/WFH/Camel$ tree  
 .  
 ├── Client  
 │   ├── BMD  
@@ -36,14 +36,13 @@ username@system_name:~/WFH/Camel$ tree
 │   │   └── esb_app.conf  
 │   ├── src  
 │   │   ├── adapter  
+│   │   │   ├── email.c  
+│   │   │   ├── email.h  
 │   │   │   ├── function_lookup_and_invocation.c  
 │   │   │   ├── function_lookup_and_invocation.h  
-│   │   │   ├── header  
-│   │   │   │   ├── email.h  
-│   │   │   │   └── https.h  
-│   │   │   └── library  
-│   │   │       ├── email.c  
-│   │   │       └── https.c  
+│   │   │   ├── https.c  
+│   │   │   ├── https.h  
+│   │   │   └── mail.txt  
 │   │   ├── database_handler  
 │   │   │   ├── database_access.c  
 │   │   │   ├── database_access.h  
@@ -66,11 +65,7 @@ username@system_name:~/WFH/Camel$ tree
 │   └── test  
 │       ├── munit.c  
 │       └── munit.h  
-├── Modules.pdf  
-├── mysql_dump.sql  
-├── README.md  
-├── Single_flow.png  
-└── Test Scenerio Example.pdf  
+└── README.md  
 ```
 
 # How to run
