@@ -12,14 +12,31 @@ Helpful link : https://stackoverflow.com/questions/7343833/srand-why-call-it-onl
 #include <string.h>
 #include <curl/curl.h>
 
-#define NUMBER_OF_MESG_TYPE 1
+#define NUMBER_OF_MESG_TYPE 2
+#define NUMBER_OF_BMD_GENERATED_PER_BMD_TYPE 10
+
+typedef struct {
+    char* sender;
+    char* destination;
+    char* message_type;
+    char* message_id;
+    char* signature;
+    char* reference_id;
+    char* create_on;
+} bmd_envelop;
+
+typedef struct {
+    bmd_envelop envelop;
+    char* payload;
+} bmd;
 
 char BMD_TYPES[][100]={
-                    {"user_app_880 BMD CheckStatus"},
-                    {"user_app_880 predict_nationality nationality_predictor_880"}
+                    {"user_app_880 predict_nationality nationality_predictor_880"},
+                    {"user_app_880 CheckStatus ESB"}
                   };
 
 char name[][10]={{"Rohit"},{"Deepak"},{"Rashid"},{"Suresh"},{"Biden"},{"Sunil"},{"Kiron"},{"chrish"}};
+
 
 /* taken from https://curl.se/libcurl/c/postit2.html */
 void post_data(char * file_name){
@@ -67,9 +84,29 @@ void post_data(char * file_name){
     }
 }
 
-void *test_for_different_msg_type(void * t){
-  int temp=*((int*)t);
-  char * bmd_type = BMD_TYPES[temp];
+void build_bmd_file(char * file_name,bmd * msg){
+  FILE * fp=fopen(file_name,"w");
+  fprintf(fp,
+"<BMD>\n\
+  <Envelop>\n\
+      <MessageID>%s</MessageID>\n\
+      <MessageType>%s</MessageType>\n\
+      <Sender>%s</Sender>\n\
+      <Destination>%s</Destination>\n\
+      <CreationDateTime>%s</CreationDateTime>\n\
+      <Signature>%s</Signature>\n\
+      <ReferenceID>%s</ReferenceID>\n\
+  </Envelop>\n\
+  <Payload>%s</Payload>\n\
+</BMD>",\
+  msg->envelop.message_id,msg->envelop.message_type,msg->envelop.sender,msg->envelop.destination,\
+  msg->envelop.create_on,msg->envelop.signature,msg->envelop.reference_id,msg->payload);
+  fclose(fp);
+}
+
+void *test_for_different_msg_type(void * ty){
+  int type=*(int*)ty;
+  char * bmd_type = BMD_TYPES[type];
   char* sender=malloc(100*sizeof(char));
   char* destination=malloc(100*sizeof(char));
   char* message_type=malloc(100*sizeof(char));
@@ -87,7 +124,7 @@ void *test_for_different_msg_type(void * t){
         message_type=field;
         break;
       default:
-        printf("Not expected\n");
+        printf("Not expected field %d\n",i);
         break;
     }
     field=strtok(NULL," ");
@@ -95,40 +132,50 @@ void *test_for_different_msg_type(void * t){
 
   // Use current time as seed for random generator
   srand(time(0));
-  for(int i=0;i<10;i++){
-    int number_of_different_payload=sizeof(name)/sizeof(name[0]);;
-    unsigned int rnd=rand()%number_of_different_payload;
+  for(i=0;i<NUMBER_OF_BMD_GENERATED_PER_BMD_TYPE;i++){
     char * file_name=malloc(100*sizeof(char));
-    sprintf(file_name,"BMD/BMD_TYPE_%d_NO_%d",temp,rnd);
-    FILE * fp=fopen(file_name,"w");
-    char * payload=name[rnd];
-    fprintf(fp,
-"<BMD>\n\
-    <Envelop>\n\
-        <MessageID>A9ECAEF2-107A-4452-9553-043B6D25386E</MessageID>\n\
-        <MessageType>%s</MessageType>\n\
-        <Sender>%s</Sender>\n\
-        <Destination>%s</Destination>\n\
-        <CreationDateTime>2020-08-12T05:18:00+0000</CreationDateTime>\n\
-        <Signature>63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c</Signature>\n\
-        <ReferenceID>INV-PROFILE-889712</ReferenceID>\n\
-    </Envelop>\n\
-    <Payload>%s</Payload>\n\
-</BMD>",\
-    message_type,sender,destination,payload);
-    fclose(fp);
+    sprintf(file_name,"BMD/BMD_TYPE_%d_NO_%d.txt",type,i);
+    bmd * msg=malloc(sizeof(bmd));
+    if(type==0){
+      msg->envelop.message_id="A9ECAEF2-107A-4452-9553-043B6D25386E";
+      msg->envelop.message_type=message_type;
+      msg->envelop.sender=sender;
+      msg->envelop.destination=destination;
+      msg->envelop.create_on="2020-08-12T05:18:00+0000";
+      msg->envelop.signature="63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
+      msg->envelop.reference_id="INV-PROFILE-889712";
+      msg->payload=name[rand()%(sizeof(name)/sizeof(name[0]))];
+    }
+    else if(type=1){
+      msg->envelop.message_id="A9ECAEF2-107A-4452-9553-043B6D25386E";
+      msg->envelop.message_type=message_type;
+      msg->envelop.sender=sender;
+      msg->envelop.destination=destination;
+      msg->envelop.create_on="2020-08-12T05:18:00+0000";
+      msg->envelop.signature="63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
+      char temp[10];
+      sprintf(temp,"%d",rand()%40);
+      msg->envelop.reference_id=temp;
+      msg->payload="";
+    }
+    else{
+      printf("Not expected BMD TYPE %d\n",type);
+      break;
+    }
+    build_bmd_file(file_name,msg);
     post_data(file_name);
-    // remove(file_name);
+    remove(file_name);
   }
-
 }
 
-int main(int argc, char const *argv[]) {
+int main() {
   //defining thread
 	pthread_t threads[NUMBER_OF_MESG_TYPE];
   unsigned int count=0;
   for(int i=0;i<NUMBER_OF_MESG_TYPE;i++) {
-    if(pthread_create(&threads[i],NULL,&test_for_different_msg_type,&i)!=0){
+    int * type=malloc(sizeof(int));
+    *type=i;
+    if(pthread_create(&threads[*type],NULL,test_for_different_msg_type,type)!=0){
       printf ("ERROR: child thread not created\n");
       exit(-1);
     }

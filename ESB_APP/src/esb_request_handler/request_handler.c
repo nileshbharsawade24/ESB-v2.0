@@ -16,6 +16,7 @@ Note : Configure the port and database credential appropriately
 #include <sys/types.h>
 #include <stdbool.h>
 #include <time.h>
+#include <ctype.h>
 #include <pthread.h>
 
 #include "parser/http_parser.h"
@@ -33,7 +34,11 @@ Note : Configure the port and database credential appropriately
 bool perform_request_authentication_and_validation(int sockfd,char * buffer){
   if(!is_request_http_post(buffer)){
     char * reply=malloc(500*sizeof(char));
-    sprintf(reply,"Your request has been REJECTED because it is not HTTP POST request.\nTRY AGAIN with HTTP POST\n");
+    sprintf(reply,"-----------------------------------------------------------------------\n"
+                  "Your request has been REJECTED because it is not HTTP POST request.\n"
+                  "TRY AGAIN with HTTP POST.\n"
+                  "Thanks for using our ESB SERVICE.:)\n"
+                  "-----------------------------------------------------------------------\n");
     send(sockfd, reply, strlen(reply),0);
     // printf("%s\n", );
     // fprintf(stderr, "ERROR : client id %d request is not HTTP POST\n",sockfd);
@@ -46,7 +51,11 @@ bool perform_request_authentication_and_validation(int sockfd,char * buffer){
   //here is a crack with strcmp
   if(strncmp(ESB_AUTHENTICATION_TOKEN,request_authentication_token,strlen(ESB_AUTHENTICATION_TOKEN))!=0){
     char * reply=malloc(500*sizeof(char));
-    sprintf(reply,"Your request has been REJECTED because of authentication_token.\nTRY AGAIN with correct authentication_token\n");
+    sprintf(reply,"-----------------------------------------------------------------------\n"
+                  "Your request has been REJECTED because of authentication_token.\n"
+                  "TRY AGAIN with correct authentication_token.\n"
+                  "Thanks for using our ESB SERVICE.:)\n"
+                  "-----------------------------------------------------------------------\n");
     send(sockfd, reply, strlen(reply),0);
     // printf("------------------->%ld\n",strlen(reply));
     // fprintf(stderr, "ERROR : client id %d have problem with AUTHENTICATION TOKEN\n",sockfd);
@@ -58,7 +67,7 @@ bool perform_request_authentication_and_validation(int sockfd,char * buffer){
   return true;
 }
 
-char * persist_BMD(char * buff){
+char * persist_BMD(char * buff,int sockfd){
   unsigned long tm=(unsigned long)time(NULL);
 	char *filename_http = malloc(PATH_MAX * sizeof(char));
 	char *filename_xml = malloc(PATH_MAX * sizeof(char));
@@ -72,6 +81,22 @@ char * persist_BMD(char * buff){
   parse_http_request(filename_http,filename_xml);
   //parse xml
   bmd * req=parse_xml(filename_xml);
+  //checking special case
+  if(strcmp(req->Destination,"ESB")==0 && strcmp(req->MessageType,"CheckStatus")==0){
+    char * status=select_single_field_on_one_condition("esb_request","status","id",req->ReferenceID);
+    for(char *p = status; *p; p++)*p=toupper(*p);
+    char * reply=malloc(500*sizeof(char));
+    sprintf(reply,"-----------------------------------------------------------------------\n"
+                  "STATUS regarding your Correlation Id \"%s\" ---> %s.\n"
+                  "Thanks for using our ESB SERVICE.:)\n"
+                  "-----------------------------------------------------------------------\n",req->ReferenceID,status);
+    send(sockfd, reply, strlen(reply),0);
+    remove(filename_xml);
+    remove(filename_http);
+    free(filename_http);
+    free(filename_xml);
+    return "special_case";
+  }
   // inserting a tuple in esb_request table with given fields
   char * req_id=insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
   remove(filename_http);
@@ -93,22 +118,28 @@ void *serve(void* fd) {
 	while (strlen(buffer)+1024<10240 && read(sockfd, temp, 1024)>=0) {
     temp=temp+strlen(temp);
   }
-	printf("\nClient id %d Request came.\n",sockfd);
+	printf("\nClient Socket Id %d Request came.\n",sockfd);
   //incomming HTTP POST request authentication and validation
   if(perform_request_authentication_and_validation(sockfd,buffer)){
     //persist BMD
-    char * correlation_id=persist_BMD(buffer);
-    //send acknowledege to client
-    char * reply=malloc(100*sizeof(char));
-    sprintf(reply,"Your request has been SUBMITTED.\n\"%s\" is your correlation id to check the status later.'\nThanks for using our ESB SERVICE.:)\n",correlation_id);
-    send(sockfd, reply, strlen(reply),0);
-    free(reply);
+    char * correlation_id=persist_BMD(buffer,sockfd);
+    if(strcmp(correlation_id,"special_case")!=0){
+      char * reply=malloc(500*sizeof(char));
+      sprintf(reply,"-----------------------------------------------------------------------\n"
+                    "Your request has been SUBMITTED.\n"
+                    "\"%s\" is your Correlation Id to check the status later.\n"
+                    "Thanks for using our ESB SERVICE.:)\n"
+                    "-----------------------------------------------------------------------\n",correlation_id);
+      //send acknowledege to client
+      send(sockfd, reply, strlen(reply),0);
+      free(reply);
+    }
   }
 
   free(buffer);
   //close the client socket
 	close(sockfd);
-  printf("Closed client with socket id %d...\n\n",sockfd);
+  printf("Closed Client with Socket Id %d...\n\n",sockfd);
 	pthread_exit(NULL);
 }
 
@@ -116,13 +147,13 @@ void *serve(void* fd) {
 void handle_request()
 {
 
-	int sockfd, connfd, len;
+	int sockfd, len;
 	struct sockaddr_in servaddr, cli;
 
 	// socket create and verification
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd == -1) {
-		printf("socket creation failed...\n");
+		printf("Socket creation failed...\n");
 		exit(0);
 	}
 	else
@@ -163,16 +194,17 @@ void handle_request()
 	// keep listening for new clients
 	while(1){
 		 // Accept the client socket connection
-		 connfd = accept(sockfd, (SA*)&cli, &len);
+		 int * connfd = malloc(sizeof(int));
+     *connfd= accept(sockfd, (SA*)&cli, &len);
 		 if (connfd < 0) {
 			 printf("server acccept failed...\n");
 			 exit(0);
 		 }
 		 else
-			 printf("server acccept the client with id %d ...\n",connfd);
+			 printf("server acccept the client Socket Id %d ...\n",*connfd);
 
 		 // assign different client to different thread
-		 if(pthread_create(&threads[count%NUM_THREADS],NULL,&serve,&connfd)!=0){
+		 if(pthread_create(&threads[count%NUM_THREADS],NULL,serve,connfd)!=0){
 			 printf ("ERROR: child thread not created\n");
 			 exit(-1);
 		 }

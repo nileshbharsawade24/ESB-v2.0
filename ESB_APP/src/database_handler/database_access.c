@@ -111,6 +111,35 @@ void update_single_field(MYSQL * conn, const char* const table_name, const char*
 }
 
 //select single field based on single condition given mysql connection and values
+char * select_single_field_on_one_condition(const char* const table_name,const char* const find,const char* const key,const char* const value){
+      MYSQL * conn=give_me_mysql_connection();
+      char buffer[1024];
+      if(is_field_int(key)){
+            char * query_str = "SELECT %s from %s where %s=%s";
+            sprintf(buffer, query_str,find,table_name,key,value);
+      }
+      else if(is_null(value)){
+            char * query_str = "SELECT %s from %s where %s is %s";
+            sprintf(buffer, query_str,find,table_name,key,value);
+      }
+      else{
+            char * query_str = "SELECT %s from %s where %s=\"%s\"";
+            sprintf(buffer, query_str,find,table_name,key,value);
+      }
+      printf("--> QUERY : %s\n",buffer);
+      if (mysql_query(conn, buffer)){
+        handle_error(conn);
+      }
+      MYSQL_RES *result_rows = mysql_store_result(conn);
+      MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      if(!result_row){
+        return "null";
+      }
+      return result_row[0]; //returning first row and first column value
+}
+
+
+//select single field based on single condition given mysql connection and values
 char * select_single_field_on_two_condition(const char* const table_name,const char* const find,const char* const key1,const char* const value1,const char* const key2,const char* const value2){
       MYSQL * conn = give_me_mysql_connection();
 
@@ -146,7 +175,7 @@ char * select_single_field_on_two_condition(const char* const table_name,const c
 
       if (mysql_num_fields(prepare_meta_result) != 1) /* validate column count */
       {
-        printf("=====================>%d<===========\n",mysql_num_fields(prepare_meta_result));
+        // printf("=====================>%d<===========\n",mysql_num_fields(prepare_meta_result));
         // fprintf(stderr, " invalid column count returned by MySQL\n");
         // exit(0);
         return NULL;
