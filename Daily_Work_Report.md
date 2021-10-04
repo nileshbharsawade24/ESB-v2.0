@@ -16,3 +16,4 @@
 | 28 Sep 2021  | Single flow for http             | Single flow for http    |
 | 29 Sep 2021  | Added email functionality             | Single flow for http   |
 | 30 Sep 2021  | Worked on email functionality             | Client side Testing   |
+| 1 Oct 2021   | Worked on transformation and Transportation | Client side Testing |
