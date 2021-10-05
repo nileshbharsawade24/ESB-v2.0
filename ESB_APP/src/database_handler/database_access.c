@@ -288,7 +288,7 @@ bool is_route_present_in_transport_config(const char* const route_id){
       if(!result_row){
         return false;
       }
-      return (result_row && strcmp(result_row[0],"1")==0)?true:false;
+      return true;
 }
 
 //select is_active based on three condition given mysql connection and all string values only
@@ -307,7 +307,7 @@ bool is_route_present_in_transform_config(const char* const route_id){
       if(!result_row){
         return false;
       }
-      return (result_row && strcmp(result_row[0],"1")==0)?true:false;
+      return true;
 }
 
 //insert ordered tuple in esb_request table given mysql connection and values

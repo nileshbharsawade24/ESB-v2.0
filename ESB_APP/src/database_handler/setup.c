@@ -130,7 +130,7 @@ void setup(){
         handle_error(con);
   }
 
-  //manual data filling
+  //manual data filling for http based nationality_predictor_880
   if (mysql_query(con, "insert into routes (sender,destination,message_type,is_active) values "
                        "('user_app_880','nationality_predictor_880','predict_nationality',1)"
                        )){
@@ -157,6 +157,43 @@ void setup(){
 
   if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
                        "(1,'method','http')"
+                       )){
+        handle_error(con);
+  }
+
+  //manual data filling for sftp based application
+  if (mysql_query(con, "insert into routes (sender,destination,message_type,is_active) values "
+                       "('user_app_880','sftp_application_880','transfer_file',1)"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transform_config (route_id,config_key,config_value) values "
+                       "(2,'format','csv')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(2,'transport_type','sftp')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(2,'server_ip_or_hostname','test.rebex.net:22')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(2,'username','demo')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(2,'password','password')"
                        )){
         handle_error(con);
   }

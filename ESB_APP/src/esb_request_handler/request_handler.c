@@ -77,12 +77,10 @@ char * persist_BMD(char * buff,int sockfd){
   parse_http_request(filename_http,filename_xml);
   //parse xml
   bmd * req=parse_xml(filename_xml);
-  if(req==NULL){
-    exit(1);
-  }
   //checking special case
   if(strcmp(req->Destination,"ESB")==0 && strcmp(req->MessageType,"CheckStatus")==0){
-    char * status=select_single_field_on_one_condition("esb_request","status","id",req->ReferenceID);
+    char * status=malloc(20*sizeof(char));
+    strcpy(status,select_single_field_on_one_condition("esb_request","status","id",req->ReferenceID));
     for(char *p = status; *p; p++)*p=toupper(*p);
     char * reply=malloc(500*sizeof(char));
     sprintf(reply,"-----------------------------------------------------------------------\n"
@@ -95,6 +93,7 @@ char * persist_BMD(char * buff,int sockfd){
     free(filename_xml);
     free(reply);
     free(req);
+    free(status);
     return "special_case";
   }
   // inserting a tuple in esb_request table with given fields
@@ -138,7 +137,6 @@ void *serve(void* fd) {
       free(reply);
     }
   }
-
   free(buffer);
   //close the client socket
 	close(sockfd);

@@ -42,8 +42,10 @@ bool is_request_http_post(char * buff){
   }
   first_line[n]='\0';
   if (check_word_in_sentence("HTTP",first_line) && check_word_in_sentence("POST",first_line)) {
+		free(first_line);
     return true;
   }
+	free(first_line);
   return false;
 }
 

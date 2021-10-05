@@ -32,9 +32,9 @@ void *work(void * t){
   sprintf(id,"%d",mytask->id);
   if(!authenticate_and_validate_BMD(req)){
     update_single_field(connection, "esb_request","status","failed","id",id);
+    update_single_field(connection, "esb_request","status_details","BMD authentication or validation Failed.","id", id);
     cleanup(req,mytask);
   }
-
   call_function("transform",req->Destination, req);
   call_function("transport",req->Destination, req);
   update_single_field(connection, "esb_request","status","done","id",id);
@@ -66,6 +66,7 @@ void esb_request_poller(){
       }
       else{
         update_single_field(connection, "esb_request","status","failed","id", id);
+        update_single_field(connection, "esb_request","status_details","Max Processing attempts threshold reached.","id", id);
         //do cleanup
         remove(polled_task->fpath);
         free(polled_task);

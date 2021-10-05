@@ -1,7 +1,8 @@
 # Prerequisites
 ESB_APP/src/tmp*
 ESB_APP/src/server
-Client/a.out*
+Client/a.out
+Client/client
 *.d
 
 # Object files

@@ -18,3 +18,4 @@
 | 30 Sep 2021  | Worked on email functionality             | Client side Testing   |
 | 1 Oct 2021   | Worked on transformation and Transportation | Client side Testing |
 | 4 Oct 2021   | Worked on transformation and Transportation | Added ESB Client API |
+| 5 Oct 2021   | Worked on email service integration | Simultaneous testing client added |
