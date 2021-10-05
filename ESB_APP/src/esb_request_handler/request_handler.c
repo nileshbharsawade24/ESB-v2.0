@@ -4,6 +4,7 @@ Designation : Senior Member Technical
 Employer : Broadridge
 Description : This c program will act like a server
 Note : Configure the port and database credential appropriately
+Helpful link : https://stackoverflow.com/questions/45339874/how-to-make-fprintf-writes-immediately
 */
 
 #include <unistd.h>
@@ -24,7 +25,7 @@ Note : Configure the port and database credential appropriately
 #include "../database_handler/database_access.h"
 
 #define ESB_AUTHENTICATION_TOKEN "nho2021"
-#define MAX 10240
+#define MAX 3072
 #define PORT 8888
 #define PATH_MAX 50
 #define NUM_THREADS 5
@@ -40,10 +41,6 @@ bool perform_request_authentication_and_validation(int sockfd,char * buffer){
                   "Thanks for using our ESB SERVICE.:)\n"
                   "-----------------------------------------------------------------------\n");
     send(sockfd, reply, strlen(reply),0);
-    // printf("%s\n", );
-    // fprintf(stderr, "ERROR : client id %d request is not HTTP POST\n",sockfd);
-    // close(sockfd);
-  	// pthread_exit(NULL);
     free(reply);
     return false;
   }
@@ -57,13 +54,11 @@ bool perform_request_authentication_and_validation(int sockfd,char * buffer){
                   "Thanks for using our ESB SERVICE.:)\n"
                   "-----------------------------------------------------------------------\n");
     send(sockfd, reply, strlen(reply),0);
-    // printf("------------------->%ld\n",strlen(reply));
-    // fprintf(stderr, "ERROR : client id %d have problem with AUTHENTICATION TOKEN\n",sockfd);
-    // close(sockfd);
-  	// pthread_exit(NULL);
     free(reply);
+    free(request_authentication_token);
     return false;
   }
+  free(request_authentication_token);
   return true;
 }
 
@@ -72,15 +67,19 @@ char * persist_BMD(char * buff,int sockfd){
 	char *filename_http = malloc(PATH_MAX * sizeof(char));
 	char *filename_xml = malloc(PATH_MAX * sizeof(char));
 	char *base_dir = "./tmp";
-	sprintf(filename_http, "%s/HTTP_REQUEST_%lu.txt", base_dir, tm);
-	sprintf(filename_xml, "%s/BMD_%lu.xml", base_dir, tm);
+	sprintf(filename_http, "%s/HTTP_REQUEST_%d_%lu.txt", base_dir, sockfd, tm);
+	sprintf(filename_xml, "%s/BMD_%d_%lu.xml", base_dir, sockfd, tm);
 	FILE * fp=fopen(filename_http,"w"); //opening http_request.tt file in writing mode
   fprintf(fp,"%s",buff);
+  fflush(fp);
   fclose(fp);
   // parse http request
   parse_http_request(filename_http,filename_xml);
   //parse xml
   bmd * req=parse_xml(filename_xml);
+  if(req==NULL){
+    exit(1);
+  }
   //checking special case
   if(strcmp(req->Destination,"ESB")==0 && strcmp(req->MessageType,"CheckStatus")==0){
     char * status=select_single_field_on_one_condition("esb_request","status","id",req->ReferenceID);
@@ -91,17 +90,20 @@ char * persist_BMD(char * buff,int sockfd){
                   "Thanks for using our ESB SERVICE.:)\n"
                   "-----------------------------------------------------------------------\n",req->ReferenceID,status);
     send(sockfd, reply, strlen(reply),0);
-    remove(filename_xml);
     remove(filename_http);
     free(filename_http);
     free(filename_xml);
+    free(reply);
+    free(req);
     return "special_case";
   }
   // inserting a tuple in esb_request table with given fields
-  char * req_id=insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,req->MessageID,"now()",filename_xml,"Available","0","-");
+  char * req_id=insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,\
+    req->MessageID,"now()",filename_xml,"Available","0","-");
   remove(filename_http);
   free(filename_http);
   free(filename_xml);
+  free(req);
   return req_id;
 }
 
@@ -115,9 +117,10 @@ void *serve(void* fd) {
   char * temp=malloc(MAX*sizeof(char));
   char * buffer=temp;
 	bzero(buffer, MAX);
-	while (strlen(buffer)+1024<10240 && read(sockfd, temp, 1024)>=0) {
+	while (read(sockfd, temp, 1024)>=0) {
     temp=temp+strlen(temp);
   }
+  *temp='\0';
 	printf("\nClient Socket Id %d Request came.\n",sockfd);
   //incomming HTTP POST request authentication and validation
   if(perform_request_authentication_and_validation(sockfd,buffer)){
@@ -139,6 +142,7 @@ void *serve(void* fd) {
   free(buffer);
   //close the client socket
 	close(sockfd);
+  free(fd);
   printf("Closed Client with Socket Id %d...\n\n",sockfd);
 	pthread_exit(NULL);
 }
@@ -157,7 +161,7 @@ void handle_request()
 		exit(0);
 	}
 	else
-		printf("Socket successfully created..\n");
+		printf("Socket successfully created...\n");
 
 	bzero(&servaddr, sizeof(servaddr));
 
@@ -172,7 +176,7 @@ void handle_request()
 		exit(0);
 	}
 	else
-		printf("Server socket successfully binded..\n");
+		printf("Server socket successfully binded...\n");
 
 	// Now server is ready to listen and verification
 	if ((listen(sockfd, 5)) != 0) {
@@ -180,7 +184,7 @@ void handle_request()
 		exit(0);
 	}
 	else{
-		printf("Server listening on PORT NO %d ...\n",PORT);
+		printf("Server listening on PORT NO %d...\n",PORT);
   }
 	len = sizeof(cli);
 
@@ -218,7 +222,6 @@ void handle_request()
   for(int i=0;i<NUM_THREADS;i++){
     pthread_join(threads[i], NULL);
   }
-
 }
 
 /* for testing purpose  only */

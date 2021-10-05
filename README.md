@@ -76,11 +76,16 @@ If not, then setup your database and tables with appropriate schema and index an
     make setup
     ./setup
 
-Then run the esb application with following commands :
+Then run the esb application server with following commands :
 
     make clean
     make all
     ./server
+
+Then open another terminal and go to Client/ directory and test the ESB application by running the simultaneous clients of different BMD types with following commands :
+
+    gcc -o client test.c -lpthread -lcurl
+    ./client
 
 # References
 [The libcurl C API](https://curl.se/libcurl/c/)  

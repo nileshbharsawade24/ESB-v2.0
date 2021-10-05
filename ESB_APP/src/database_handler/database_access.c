@@ -10,14 +10,17 @@ Helpful links : https://stackoverflow.com/questions/14827783/auto-increment-and-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <ctype.h>
 
 #include "database_access.h"
 // #include "../worker/worker.h"
-#define mysql_user_name "test_user"
-#define mysql_user_password "test_password"
-#define mysql_host "localhost"
-#define mysql_db_name "CAMEL_DB"
+#define MYSQL_USER_NAME "test_user"
+#define MYSQL_USER_PASSWORD "test_password"
+#define MYSQL_HOST "localhost"
+#define MYSQL_DB_NAME "CAMEL_DB"
+
+#define MAX_RETRY_FOR_GETTING_MYSQL_CONNECTION 5
 
 // handle error based on mysql connection
 void handle_error(MYSQL *connection){
@@ -126,12 +129,13 @@ char * select_single_field_on_one_condition(const char* const table_name,const c
             char * query_str = "SELECT %s from %s where %s=\"%s\"";
             sprintf(buffer, query_str,find,table_name,key,value);
       }
-      printf("--> QUERY : %s\n",buffer);
+      // printf("--> QUERY : %s\n",buffer);
       if (mysql_query(conn, buffer)){
         handle_error(conn);
       }
       MYSQL_RES *result_rows = mysql_store_result(conn);
       MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      mysql_close(conn);
       if(!result_row){
         return "null";
       }
@@ -224,6 +228,7 @@ char * select_single_field_on_two_condition(const char* const table_name,const c
         fprintf(stderr, " %s\n", mysql_error(conn));
         exit(0);
       }
+      mysql_close(conn);
       return result;
 }
 
@@ -240,6 +245,7 @@ char * get_route_id_form_unique_tuple(const char* const sender,const char* const
       MYSQL_RES *result_rows = mysql_store_result(conn);
       MYSQL_ROW result_row=mysql_fetch_row(result_rows);
       // printf("%s %s\n",result_row[0],result_row[1]);
+      mysql_close(conn);
       if(result_row){
         return result_row[0];
       }
@@ -259,6 +265,7 @@ char * is_route_active(const char* const sender,const char* const destination,co
       MYSQL_RES *result_rows = mysql_store_result(conn);
       MYSQL_ROW result_row=mysql_fetch_row(result_rows);
       // printf("%s %s\n",result_row[0],result_row[1]);
+      mysql_close(conn);
       if(result_row && strcmp(result_row[1],"1")==0){
         return result_row[0];
       }
@@ -277,6 +284,7 @@ bool is_route_present_in_transport_config(const char* const route_id){
       }
       MYSQL_RES *result_rows = mysql_store_result(conn);
       MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      mysql_close(conn);
       if(!result_row){
         return false;
       }
@@ -295,6 +303,7 @@ bool is_route_present_in_transform_config(const char* const route_id){
       }
       MYSQL_RES *result_rows = mysql_store_result(conn);
       MYSQL_ROW result_row=mysql_fetch_row(result_rows);
+      mysql_close(conn);
       if(!result_row){
         return false;
       }
@@ -319,6 +328,7 @@ char* insert_one_in_esb_request(const char* const f2,const char* const f3,const 
   MYSQL_RES *result_rows = mysql_store_result(conn);
   MYSQL_ROW result_row=mysql_fetch_row(result_rows);
   // printf("%s %s\n",result_row[0],result_row[1]);
+  mysql_close(conn);
   if(result_row){
     return result_row[0];
   }
@@ -327,17 +337,24 @@ char* insert_one_in_esb_request(const char* const f2,const char* const f3,const 
 
 MYSQL * give_me_mysql_connection(){
   MYSQL *connection = mysql_init(NULL);
-
   if (connection == NULL)
   {
       fprintf(stderr, "%s\n", mysql_error(connection));
       exit(1);
   }
-
-  if (mysql_real_connect(connection, mysql_host, mysql_user_name, mysql_user_password,
-          mysql_db_name, 0, NULL, 0) == NULL)
-  {
-        handle_error(connection);
+  for(int i=0;i<MAX_RETRY_FOR_GETTING_MYSQL_CONNECTION;i++){
+    if(mysql_real_connect(connection, MYSQL_HOST, MYSQL_USER_NAME, MYSQL_USER_PASSWORD,
+            MYSQL_DB_NAME, 0, NULL, 0)!=NULL){
+      break;
+    }
+    else if(i+1==MAX_RETRY_FOR_GETTING_MYSQL_CONNECTION){
+      fprintf(stderr, "ERROR : You are not getting MySQL connection even after trying for %d times.\n",
+              MAX_RETRY_FOR_GETTING_MYSQL_CONNECTION);
+      break;
+    }
+    else{
+      sleep(1);
+    }
   }
   return connection;
 }
@@ -386,8 +403,8 @@ int main(int argc, char **argv)
       exit(1);
   }
 
-  if (mysql_real_connect(con, mysql_host, mysql_user_name, mysql_user_password,
-          mysql_db_name, 0, NULL, 0) == NULL)
+  if (mysql_real_connect(con, MYSQL_HOST, MYSQL_USER_NAME, MYSQL_USER_PASSWORD,
+          MYSQL_DB_NAME, 0, NULL, 0) == NULL)
   {
         handle_error(con);
   }

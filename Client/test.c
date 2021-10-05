@@ -31,8 +31,8 @@ typedef struct {
 } bmd;
 
 char BMD_TYPES[][100]={
-                    {"user_app_880 predict_nationality nationality_predictor_880"},
-                    {"user_app_880 CheckStatus ESB"}
+                    {"user_app_880 nationality_predictor_880 predict_nationality"},
+                    {"user_app_880 ESB CheckStatus"}
                   };
 
 char name[][10]={{"Rohit"},{"Deepak"},{"Rashid"},{"Suresh"},{"Biden"},{"Sunil"},{"Kiron"},{"chrish"}};
@@ -107,9 +107,9 @@ void build_bmd_file(char * file_name,bmd * msg){
 void *test_for_different_msg_type(void * ty){
   int type=*(int*)ty;
   char * bmd_type = BMD_TYPES[type];
-  char* sender=malloc(100*sizeof(char));
-  char* destination=malloc(100*sizeof(char));
-  char* message_type=malloc(100*sizeof(char));
+  char* sender=NULL;
+  char* destination=NULL;
+  char* message_type=NULL;
   char * field=strtok(bmd_type," ");
   int i=0;
   while(field!=NULL){
@@ -134,7 +134,7 @@ void *test_for_different_msg_type(void * ty){
   srand(time(0));
   for(i=0;i<NUMBER_OF_BMD_GENERATED_PER_BMD_TYPE;i++){
     char * file_name=malloc(100*sizeof(char));
-    sprintf(file_name,"BMD/BMD_TYPE_%d_NO_%d.txt",type,i);
+    sprintf(file_name,"BMD/BMD_TYPE_%d_NO_%d.xml",type,i);
     bmd * msg=malloc(sizeof(bmd));
     if(type==0){
       msg->envelop.message_id="A9ECAEF2-107A-4452-9553-043B6D25386E";
@@ -154,7 +154,7 @@ void *test_for_different_msg_type(void * ty){
       msg->envelop.create_on="2020-08-12T05:18:00+0000";
       msg->envelop.signature="63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
       char temp[10];
-      sprintf(temp,"%d",rand()%40);
+      sprintf(temp,"%d",(rand()%10)+127);
       msg->envelop.reference_id=temp;
       msg->payload="";
     }
@@ -165,7 +165,10 @@ void *test_for_different_msg_type(void * ty){
     build_bmd_file(file_name,msg);
     post_data(file_name);
     remove(file_name);
+    free(file_name);
+    free(msg);
   }
+  free(ty);
 }
 
 int main() {
