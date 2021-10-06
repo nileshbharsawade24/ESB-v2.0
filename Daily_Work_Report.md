@@ -19,3 +19,4 @@
 | 1 Oct 2021   | Worked on transformation and Transportation | Client side Testing |
 | 4 Oct 2021   | Worked on transformation and Transportation | Added ESB Client API |
 | 5 Oct 2021   | Worked on email service integration | Simultaneous testing client added |
+| 6 Oct 2021   | Updated structure of BMD Data, Documentation | Documentation, Error solving |

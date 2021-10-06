@@ -154,7 +154,7 @@ void *test_for_different_msg_type(void * ty){
       msg->envelop.create_on="2020-08-12T05:18:00+0000";
       msg->envelop.signature="63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
       char temp[10];
-      sprintf(temp,"%d",(rand()%10)+127);
+      sprintf(temp,"%d",(rand()%200));
       msg->envelop.reference_id=temp;
       msg->payload="";
     }

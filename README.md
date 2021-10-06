@@ -76,6 +76,7 @@ If not, then setup your database and tables with appropriate schema and index an
     make setup
     ./setup
 
+Now make sure that no process is running on port number 8888.</br>
 Then run the esb application server with following commands :
 
     make clean
@@ -95,4 +96,4 @@ Then open another terminal and go to Client/ directory and test the ESB applicat
 [Deepak kumar](https://github.com/deepakjnv880)  
 [Rohit bhamu](https://github.com/rohitbhamu)  
 
-# Thanks for visiting :slightly_smiling_face: .
+# Happy coding :slightly_smiling_face: .

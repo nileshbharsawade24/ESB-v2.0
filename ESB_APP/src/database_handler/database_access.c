@@ -73,13 +73,13 @@ void do_binding(MYSQL_BIND * B,const char* const key,const char* const value){
      fprintf(stderr, "ERROR : Key `%s` is a number while value `%s` is not a number.\n",key,value);
      exit(1);
    }
-   long long int * temp=malloc(sizeof(int));
+   long unsigned int * temp=malloc(sizeof(long unsigned int));
    *temp=atoi(value);
    B->buffer_type= MYSQL_TYPE_LONG;
    B->buffer= (char *)temp;
  }
  else{
-   long unsigned * temp=malloc(sizeof(int));
+   long unsigned int * temp=malloc(sizeof(long unsigned int));
    *temp=strlen(value);
    B->buffer_type= MYSQL_TYPE_STRING;
    B->buffer= (char *)value;
@@ -191,7 +191,7 @@ char * select_single_field_on_two_condition(const char* const table_name,const c
       memset(&rb, 0, sizeof(rb));
 
       /* STRING COLUMN */
-      long unsigned * temp=malloc(sizeof(int));
+      long unsigned int * temp=malloc(sizeof(long unsigned int));
       *temp=50;
       rb.buffer_type= MYSQL_TYPE_STRING;
       rb.buffer= (char *)result;
