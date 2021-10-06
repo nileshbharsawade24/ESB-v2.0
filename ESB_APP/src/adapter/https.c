@@ -6,15 +6,15 @@
 #define URL_MAX 100
 
 void transform_for_nationality_predictor_880(bmd * msg){
-  msg->Payload=msg->Payload;//basically changed tranformed will override non transformed
+  msg->payload=msg->payload;//basically changed tranformed will override non transformed
   return;
 }
 
 void transport_for_nationality_predictor_880(bmd * msg){
-  char * route_id= get_route_id_form_unique_tuple(msg->Sender,msg->Destination,msg->MessageType);
+  char * route_id= get_route_id_form_unique_tuple(msg->envelop.Sender,msg->envelop.Destination,msg->envelop.MessageType);
   const char* const base_url=select_single_field_on_two_condition("transport_config","config_value","route_id",route_id,"config_key","api");
   char* full_url=malloc(URL_MAX*sizeof(char));
-  sprintf(full_url,"%s/?name=%s",base_url,msg->Payload);
+  sprintf(full_url,"%s/?name=%s",base_url,msg->payload);
   CURL *curl;
   CURLcode response_code;
   //Global libcurl initialisation

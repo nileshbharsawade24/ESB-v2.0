@@ -35,8 +35,8 @@ void *work(void * t){
     update_single_field(connection, "esb_request","status_details","BMD authentication or validation Failed.","id", id);
     cleanup(req,mytask);
   }
-  call_function("transform",req->Destination, req);
-  call_function("transport",req->Destination, req);
+  call_function("transform",req->envelop.Destination, req);
+  call_function("transport",req->envelop.Destination, req);
   update_single_field(connection, "esb_request","status","done","id",id);
   cleanup(req,mytask);
 }

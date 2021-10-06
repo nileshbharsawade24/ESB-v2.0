@@ -6,12 +6,28 @@
 
 //Structure for BMD Message data
 typedef struct {
-    const char *MessageID;
-    const char *MessageType;
-    const char *Sender;
-    const char *Destination;
-    const char *CreationDateTime;
-    const char *Signature;
-    const char *ReferenceID;
-    const char *Payload;
+    char *MessageID;
+    char *MessageType;
+    char *Sender;
+    char *Destination;
+    char *CreationDateTime;
+    char *Signature;
+    char *ReferenceID;
+}bmd_envelop;
+
+typedef struct {
+    bmd_envelop envelop;
+    char* payload;
 }bmd;
+
+
+// typedef struct {
+//     char* sender;
+//     char* destination;
+//     char* message_type;
+//     char* message_id;
+//     char* signature;
+//     char* reference_id;
+//     char* create_on;
+// } bmd_envelop;
+

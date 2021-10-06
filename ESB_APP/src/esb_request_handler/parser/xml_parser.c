@@ -69,26 +69,26 @@ The validation will be done mainly for the envelope part of the BMD.
 bool authenticate_and_validate_BMD (bmd* bmd_msg){
 
     //authentication
-    if(bmd_msg->Signature == NULL){
+    if(bmd_msg->envelop.Signature == NULL){
        return false;
     }
 
     //validation : part1
-    if(bmd_msg->Sender == NULL){
+    if(bmd_msg->envelop.Sender == NULL){
        return false;
     }
-    if(bmd_msg->Destination == NULL){
+    if(bmd_msg->envelop.Destination == NULL){
        return false;
     }
-    if(bmd_msg->MessageID == NULL){
+    if(bmd_msg->envelop.MessageID == NULL){
         return false;
     }
-    if(bmd_msg->MessageType == NULL){
+    if(bmd_msg->envelop.MessageType == NULL){
        return false;
     }
 
     //validation : part2
-    char * route_id=is_route_active(bmd_msg->Sender,bmd_msg->Destination,bmd_msg->MessageType);
+    char * route_id=is_route_active(bmd_msg->envelop.Sender,bmd_msg->envelop.Destination,bmd_msg->envelop.MessageType);
     if(route_id==NULL){
       return false;
     }
@@ -101,7 +101,7 @@ bool authenticate_and_validate_BMD (bmd* bmd_msg){
     }
     //validation : part3
     //check for payload size, if its greater than 5 MB then its not valid.
-    float payload_size_in_MB=strlen(bmd_msg->Payload)/1000000.0;
+    float payload_size_in_MB=strlen(bmd_msg->payload)/1000000.0;
     // printf("----payload_size_in_MB------->%f\n",payload_size_in_MB);
     if(payload_size_in_MB>5){
       return false;
@@ -154,14 +154,14 @@ bmd * parse_xml(char * filepath) {
 
 
     //storing value in bmd_bsg object
-    bmd_msg->MessageID= get_element_text("//MessageID", doc);
-    bmd_msg->MessageType = get_element_text("//MessageType", doc);
-    bmd_msg->Sender= get_element_text("//Sender", doc);
-    bmd_msg->Destination= get_element_text("//Destination", doc);
-    bmd_msg->CreationDateTime= get_element_text("//CreationDateTime", doc);
-    bmd_msg->Signature= get_element_text("//Signature", doc);
-    bmd_msg->ReferenceID= get_element_text("//ReferenceID", doc);
-    bmd_msg->Payload= get_element_text("//Payload", doc);
+    bmd_msg->envelop.MessageID= get_element_text("//MessageID", doc);
+    bmd_msg->envelop.MessageType = get_element_text("//MessageType", doc);
+    bmd_msg->envelop.Sender= get_element_text("//Sender", doc);
+    bmd_msg->envelop.Destination= get_element_text("//Destination", doc);
+    bmd_msg->envelop.CreationDateTime= get_element_text("//CreationDateTime", doc);
+    bmd_msg->envelop.Signature= get_element_text("//Signature", doc);
+    bmd_msg->envelop.ReferenceID= get_element_text("//ReferenceID", doc);
+    bmd_msg->payload= get_element_text("//Payload", doc);
 
     xmlFreeDoc(doc);
     xmlCleanupParser();

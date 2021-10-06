@@ -20,22 +20,6 @@
 
 #define PATH_MAX 50
 
-//---- have to change this structure throughout the code-----
-
-// typedef struct {
-//     char* sender;
-//     char* destination;
-//     char* message_type;
-//     char* message_id;
-//     char* signature;
-//     char* reference_id;
-//     char* create_on;
-// } bmd_envelop;
-
-// typedef struct {
-//     bmd_envelop envelop;
-//     char* payload;
-// } bmd;
 
 void transform_for_email_service_123(bmd * msg){
     //writing into text file which will be needed
@@ -48,7 +32,7 @@ void transform_for_email_service_123(bmd * msg){
     unsigned long tm=(unsigned long) time(NULL);
     char *filename_txt=malloc(PATH_MAX*sizeof(char)); 
     char *filename_html=malloc(PATH_MAX*sizeof(char));
-    char *temp_dir="./temp";
+    char *temp_dir="./tmp";
     
     sprintf(filename_txt, "%s/mail_%lu.txt",temp_dir,tm);
     sprintf(filename_html, "%s/file_%lu.html",temp_dir,tm);

@@ -78,15 +78,15 @@ char * persist_BMD(char * buff,int sockfd){
   //parse xml
   bmd * req=parse_xml(filename_xml);
   //checking special case
-  if(strcmp(req->Destination,"ESB")==0 && strcmp(req->MessageType,"CheckStatus")==0){
+  if(strcmp(req->envelop.Destination,"ESB")==0 && strcmp(req->envelop.MessageType,"CheckStatus")==0){
     char * status=malloc(20*sizeof(char));
-    strcpy(status,select_single_field_on_one_condition("esb_request","status","id",req->ReferenceID));
+    strcpy(status,select_single_field_on_one_condition("esb_request","status","id",req->envelop.ReferenceID));
     for(char *p = status; *p; p++)*p=toupper(*p);
     char * reply=malloc(500*sizeof(char));
     sprintf(reply,"-----------------------------------------------------------------------\n"
                   "STATUS regarding your Correlation Id \"%s\" ---> %s.\n"
                   "Thanks for using our ESB SERVICE.:)\n"
-                  "-----------------------------------------------------------------------\n",req->ReferenceID,status);
+                  "-----------------------------------------------------------------------\n",req->envelop.ReferenceID,status);
     send(sockfd, reply, strlen(reply),0);
     remove(filename_http);
     free(filename_http);
@@ -97,8 +97,8 @@ char * persist_BMD(char * buff,int sockfd){
     return "special_case";
   }
   // inserting a tuple in esb_request table with given fields
-  char * req_id=insert_one_in_esb_request(req->Sender,req->Destination,req->MessageType,req->ReferenceID,\
-    req->MessageID,"now()",filename_xml,"Available","0","-");
+  char * req_id=insert_one_in_esb_request(req->envelop.Sender,req->envelop.Destination,req->envelop.MessageType,req->envelop.ReferenceID,\
+    req->envelop.MessageID,"now()",filename_xml,"Available","0","-");
   remove(filename_http);
   free(filename_http);
   free(filename_xml);
