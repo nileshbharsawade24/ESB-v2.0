@@ -25,15 +25,18 @@ typedef struct
     void (*func)(bmd*);
 } function_map;
 
+
 const function_map load_corrosponding_transformation_function[] = {
-    {"nationality_predictor_880", transform_for_nationality_predictor_880}
+    {"nationality_predictor_880", transform_for_nationality_predictor_880}//,
+    //{"email service transform", transform_email_service},
     // {"PO svc transport", transport_bmd_PO_svc},
     // {"Credit service tranform", tranform_bmd_Credit_svc},
     // {"Credit service transport", transport_bmd_Credit_svc}
 };
 
 const function_map load_corrosponding_transportation_function[] = {
-    {"nationality_predictor_880", transport_for_nationality_predictor_880}
+    {"nationality_predictor_880", transport_for_nationality_predictor_880}//,
+    //{"email service transport",transport_email_service};
     // {"PO svc transport", transport_bmd_PO_svc},
     // {"Credit service tranform", tranform_bmd_Credit_svc},
     // {"Credit service transport", transport_bmd_Credit_svc}

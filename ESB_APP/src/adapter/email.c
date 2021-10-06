@@ -20,33 +20,41 @@
 
 #define PATH_MAX 50
 
+//---- have to change this structure throughout the code-----
 
-typedef struct {
-    char* sender;
-    char* destination;
-    char* message_type;
-    char* message_id;
-    char* signature;
-    char* reference_id;
-    char* create_on;
-} bmd_envelop;
+// typedef struct {
+//     char* sender;
+//     char* destination;
+//     char* message_type;
+//     char* message_id;
+//     char* signature;
+//     char* reference_id;
+//     char* create_on;
+// } bmd_envelop;
 
-typedef struct {
-    bmd_envelop envelop;
-    char* payload;
-} bmd;
+// typedef struct {
+//     bmd_envelop envelop;
+//     char* payload;
+// } bmd;
 
-char * transform_for_email_service_123(bmd * msg){
+void transform_for_email_service_123(bmd * msg){
     //writing into text file which will be needed
     //right now returning file_name.. [DOUBT about generalizing return type]
-
+  
+    /*----- we're supposed to  do two task here---
+    *   1. writing into mail.txt file 
+    *   2. converting our bmd into html 
+    /*/
     unsigned long tm=(unsigned long) time(NULL);
-    char *filename_txt=malloc(PATH_MAX*sizeof(char)); //define PATH_MAX
+    char *filename_txt=malloc(PATH_MAX*sizeof(char)); 
+    char *filename_html=malloc(PATH_MAX*sizeof(char));
     char *temp_dir="./temp";
     
     sprintf(filename_txt, "%s/mail_%lu.txt",temp_dir,tm);
-
-    FILE* fp=fopen(filename_txt,"w"); //opening the mail.txt in writing mode_t
+    sprintf(filename_html, "%s/file_%lu.html",temp_dir,tm);
+    
+    //Task 1: creating the mail.txt 
+    FILE* fp=fopen(filename_txt,"w"); 
 
     //write in file
     fprintf(fp,
@@ -59,6 +67,38 @@ char * transform_for_email_service_123(bmd * msg){
 
     //close the file pointer
     fclose (fp);
+
+    //Task 2 : creating the file.html ( this is basically xml to html transformation)
+    FILE* fp=fopen(filename_html,"w"); 
+    fprintf(fp,"<!DOCTYPE html>");
+    fprintf(fp,"    <html>");
+    fprintf(fp,"        <head>");
+    fprintf(fp,"            <meta charset='UTF-8'>");
+    fprintf(fp,"                <title>XML To HTML</title>");
+    fprintf(fp,"        </head>");
+    fprintf(fp,"    <body>");
+    fprintf(fp,"        <table border=1>\n");
+    fprintf(fp,"            <thead>\n");
+    fprintf(fp,"                <tr>\n");
+    fprintf(fp,"                    <th>Payload</th>\n");
+    fprintf(fp,"                </tr>\n");
+    fprintf(fp,"            </thead>\n");
+    fprintf(fp,"            <tbody>\n");
+    fprintf(fp,"                <tr>\n");
+    fprintf(fp,"                    <td>%s</td>\n",msg->payload);
+    fprintf(fp,"                </tr>\n");
+    fprintf(fp,"            </tbody>\n");
+    fprintf(fp,"        </table>\n");
+    fprintf(fp,"    </body>\n");
+    fprintf(fp,"</html>\n");
+
+    //close file ptr
+    fclose(fp);
+
+
+      
+  
+//NOTE: [This can be changed] As we are not using bmd object anymore, we Will save these two files name into this object itself. and we will use this object so that our files return types and calling method stays generelized 
 
 return filename_txt; //returning the name of newly created mail.txt file
 
