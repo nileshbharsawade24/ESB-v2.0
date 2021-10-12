@@ -26,7 +26,7 @@ Helpful link : https://stackoverflow.com/questions/45339874/how-to-make-fprintf-
 
 #define ESB_AUTHENTICATION_TOKEN "nho2021"
 #define MAX 3072
-#define PORT 8888
+#define PORT 1111
 #define PATH_MAX 50
 #define NUM_THREADS 5
 #define SA struct sockaddr
@@ -120,6 +120,7 @@ void *serve(void* fd) {
     temp=temp+strlen(temp);
   }
   *temp='\0';
+  //printf("buffer : %s\n",buffer);
 	printf("\nClient Socket Id %d Request came.\n",sockfd);
   //incomming HTTP POST request authentication and validation
   if(perform_request_authentication_and_validation(sockfd,buffer)){
@@ -160,6 +161,10 @@ void handle_request()
 	}
 	else
 		printf("Socket successfully created...\n");
+
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0){
+    		fprintf(stderr,"ERROR : setsockopt(SO_REUSEADDR) failed\n");
+  	}
 
 	bzero(&servaddr, sizeof(servaddr));
 

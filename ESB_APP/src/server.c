@@ -19,5 +19,6 @@ int main(int argc, char const *argv[]) {
   else{
     esb_request_poller();//parent will do polling and assigning task to threads
   }
+  while(1);
   return 0;
 }

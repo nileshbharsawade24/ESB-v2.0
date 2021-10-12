@@ -15,8 +15,8 @@ Helpful links : https://stackoverflow.com/questions/14827783/auto-increment-and-
 
 #include "database_access.h"
 // #include "../worker/worker.h"
-#define MYSQL_USER_NAME "test_user"
-#define MYSQL_USER_PASSWORD "test_password"
+#define MYSQL_USER_NAME "root"
+#define MYSQL_USER_PASSWORD "Prideoflion@01"
 #define MYSQL_HOST "localhost"
 #define MYSQL_DB_NAME "CAMEL_DB"
 

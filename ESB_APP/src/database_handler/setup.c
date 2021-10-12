@@ -11,8 +11,8 @@ NOTE2 : change mysql_user_name and my_sql_password appropritely or just create o
 #include <stdio.h>
 #include <stdlib.h>
 
-#define mysql_user_name "test_user"
-#define mysql_user_password "test_password"
+#define mysql_user_name "root"
+#define mysql_user_password "Nilesh@24"
 #define mysql_host "localhost"
 
 //this function will handle error given mysql connection `connection`

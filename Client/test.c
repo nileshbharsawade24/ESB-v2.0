@@ -12,7 +12,7 @@ Helpful link : https://stackoverflow.com/questions/7343833/srand-why-call-it-onl
 #include <string.h>
 #include <curl/curl.h>
 
-#define NUMBER_OF_MESG_TYPE 2
+#define NUMBER_OF_MESG_TYPE 3
 #define NUMBER_OF_BMD_GENERATED_PER_BMD_TYPE 10
 
 typedef struct {
@@ -32,7 +32,8 @@ typedef struct {
 
 char BMD_TYPES[][100]={
                     {"user_app_880 nationality_predictor_880 predict_nationality"},
-                    {"user_app_880 ESB CheckStatus"}
+                    {"user_app_880 sftp_application_880 transfer_file"},
+                    {"user_app_880 email_service_transform email_transfer"}
                   };
 
 char name[][10]={{"Rohit"},{"Deepak"},{"Rashid"},{"Suresh"},{"Biden"},{"Sunil"},{"Kiron"},{"chrish"}};
@@ -62,7 +63,7 @@ void post_data(char * file_name){
       curl_mime_filedata(field, file_name);
 
       /* what URL that receives this POST */
-      curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:8888");
+      curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:1111");
       curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
       curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
       curl_easy_setopt(curl, CURLOPT_HTTP09_ALLOWED, 1);
@@ -146,7 +147,19 @@ void *test_for_different_msg_type(void * ty){
       msg->envelop.reference_id="INV-PROFILE-889712";
       msg->payload=name[rand()%(sizeof(name)/sizeof(name[0]))];
     }
-    else if(type=1){
+    else if(type==1){
+      msg->envelop.message_id="A9ECAEF2-107A-4452-9553-043B6D25386E";
+      msg->envelop.message_type=message_type;
+      msg->envelop.sender=sender;
+      msg->envelop.destination=destination;
+      msg->envelop.create_on="2020-08-12T05:18:00+0000";
+      msg->envelop.signature="63f5f61f7a79301f715433f8f3689390d1f5da4f855169023300491c00b8113c";
+      char temp[10];
+      sprintf(temp,"%d",(rand()%200));
+      msg->envelop.reference_id=temp;
+      msg->payload="";
+    }
+    else if(type==2){
       msg->envelop.message_id="A9ECAEF2-107A-4452-9553-043B6D25386E";
       msg->envelop.message_type=message_type;
       msg->envelop.sender=sender;
@@ -164,7 +177,7 @@ void *test_for_different_msg_type(void * ty){
     }
     build_bmd_file(file_name,msg);
     post_data(file_name);
-    remove(file_name);
+    //remove(file_name);
     free(file_name);
     free(msg);
   }

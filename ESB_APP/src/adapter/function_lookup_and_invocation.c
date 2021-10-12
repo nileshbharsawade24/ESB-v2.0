@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "https.h"
+#include "email.h"
+#include "ftp.h"
 #include "function_lookup_and_invocation.h"
 /**
  * These should come from the header file of the respective service
@@ -27,17 +29,17 @@ typedef struct
 
 
 const function_map load_corrosponding_transformation_function[] = {
-    {"nationality_predictor_880", transform_for_nationality_predictor_880}//,
-    //{"email service transform", transform_email_service},
-    // {"PO svc transport", transport_bmd_PO_svc},
+    {"nationality_predictor_880", transform_for_nationality_predictor_880},//,
+    {"email_service_transform", transform_for_email_service_123},
+    {"sftp_application_880", transform_for_ftp_serice_880},
     // {"Credit service tranform", tranform_bmd_Credit_svc},
     // {"Credit service transport", transport_bmd_Credit_svc}
 };
 
 const function_map load_corrosponding_transportation_function[] = {
-    {"nationality_predictor_880", transport_for_nationality_predictor_880}//,
-    //{"email service transport",transport_email_service};
-    // {"PO svc transport", transport_bmd_PO_svc},
+    {"nationality_predictor_880", transport_for_nationality_predictor_880},
+    {"email_service_transform",transport_for_email_service_123},
+    {"sftp_application_880", transport_for_ftp_serice_880}
     // {"Credit service tranform", tranform_bmd_Credit_svc},
     // {"Credit service transport", transport_bmd_Credit_svc}
 };

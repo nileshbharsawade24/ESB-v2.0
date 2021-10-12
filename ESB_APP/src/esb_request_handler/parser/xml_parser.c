@@ -101,7 +101,8 @@ bool authenticate_and_validate_BMD (bmd* bmd_msg){
     }
     //validation : part3
     //check for payload size, if its greater than 5 MB then its not valid.
-    float payload_size_in_MB=strlen(bmd_msg->payload)/1000000.0;
+    float payload_size_in_MB=0;
+    if(bmd_msg->payload)payload_size_in_MB=strlen(bmd_msg->payload)/1000000.0;
     // printf("----payload_size_in_MB------->%f\n",payload_size_in_MB);
     if(payload_size_in_MB>5){
       return false;

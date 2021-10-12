@@ -1,4 +1,5 @@
 #include <mysql.h>
+#include <stdbool.h>
 #include "../worker/worker.h"
 //this will handle error given mysql connection 'connection'
 void handle_error(MYSQL *connection);

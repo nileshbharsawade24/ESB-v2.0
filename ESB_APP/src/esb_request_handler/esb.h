@@ -3,7 +3,7 @@
 / Designation : Senior Technical Member
 / Employer : Broadridge
 */
-
+#pragma once
 //Structure for BMD Message data
 typedef struct {
     char *MessageID;
