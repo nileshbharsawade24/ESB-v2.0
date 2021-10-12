@@ -78,7 +78,9 @@ If not, then setup your database and tables with appropriate schema and index an
 
     =====================OR====================
 
-    can setup with CAMEL_DB.dump (database file)
+can setup with CAMEL_DB.dump (database file if first not working)
+
+
 
 Now make sure that no process is running on port number 8888.</br>
 Then run the esb application server with following commands :
