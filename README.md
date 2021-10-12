@@ -77,8 +77,8 @@ If not, then setup your database and tables with appropriate schema and index an
     ./setup
 
     =====================OR====================
-
-can setup with CAMEL_DB.dump (database file if first not working)
+    
+    can setup with CAMEL_DB.dump (database file if first not working)
 
 
 
@@ -100,7 +100,10 @@ Then open another terminal and go to Client/ directory and test the ESB applicat
 
 # Contributors
 [Deepak kumar](https://github.com/deepakjnv880)  
-[Rohit bhamu](https://github.com/rohitbhamu)  
+[Rohit bhamu](https://github.com/rohitbhamu)
 
+# Modifiers
+[Nilesh Bharsawade](https://github.com/nileshbharsawade24)  
+[Pavan Kolur](https://github.com/pavankolur123)
 
 # Happy coding :slightly_smiling_face: .
