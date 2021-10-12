@@ -76,6 +76,10 @@ If not, then setup your database and tables with appropriate schema and index an
     make setup
     ./setup
 
+    =====================OR====================
+
+    can setup with CAMEL_DB.dump (database file)
+
 Now make sure that no process is running on port number 8888.</br>
 Then run the esb application server with following commands :
 
@@ -95,5 +99,6 @@ Then open another terminal and go to Client/ directory and test the ESB applicat
 # Contributors
 [Deepak kumar](https://github.com/deepakjnv880)  
 [Rohit bhamu](https://github.com/rohitbhamu)  
+
 
 # Happy coding :slightly_smiling_face: .
