@@ -79,7 +79,7 @@ If not, then setup your database and tables with appropriate schema and index an
     make setup
     ./setup
 
-    =====================OR====================
+    =====================OR=====================
     
     can setup with CAMEL_DB.dump (database file if first not working)
 
