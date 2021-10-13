@@ -7,7 +7,7 @@
 #include "email.h"
 
 #define FROM_ADDR "<esbtest321@gmail.com>"
-#define CC_ADDR "<pavankolur2000@gmail.com>"
+#define CC_ADDR "<pavankolur001@gmail.com>"
 #define TO_ADR "<esb.proj2021.bat@gmail.com>"
 
 void transport_for_email_service_123(bmd * msg)
