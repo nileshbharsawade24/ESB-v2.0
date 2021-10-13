@@ -160,6 +160,25 @@ void setup(){
                        )){
         handle_error(con);
   }
+  //manual data filling for smtp based application
+   if (mysql_query(con, "insert into routes (sender,destination,message_type,is_active) values "
+                       "('user_app_880','email_service_transform','email_transfer',1)"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transform_config (route_id,config_key,config_value) values "
+                       "(2,'format','HTML')"
+                       )){
+        handle_error(con);
+  }
+
+  if (mysql_query(con, "insert into transport_config (route_id,config_key,config_value) values "
+                       "(3,'email','esb.bat2021@gmail.com')"
+                       )){
+        handle_error(con);
+  }
+
 
   //manual data filling for sftp based application
   if (mysql_query(con, "insert into routes (sender,destination,message_type,is_active) values "
